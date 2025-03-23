@@ -1,18 +1,12 @@
 # NOKIA-PK
+Repozytorium grupy **8 KS**
 
-## Nie pushujemy/zmieniamy mastera w tym repozytorium
+## Lista osób
 
-## Tree
- * BTS, COMMON, UE - components
- * googletest - ut library
- * docs - project documentation
- * lectures - notes and examples from lectures
+- Adrian Kulawik (Adrian104)
+- Paweł Mączałowski (Pawloland)
+- Jakub Mosur (mo-jakub)
+- Patryk Magiera (PatMag9)
 
-## Pytania techniczne
-Używamy **/issues**
-
-## Rejestrowanie pracy
-Po ustaleniu przypisań do grup w **/issues** robimy ticket z informacjami o grupie:  
-- lista osób,  
-- link do boarda,  
-- link do forka z praca grupową.  
+## Pozostałe informacje
+**Tablica**: GitHub Projects (https://github.com/users/Adrian104/projects/1)
