@@ -26,19 +26,22 @@ jobs:
     - name: Verify 7z installation
       run: 7z
 
+    - name: Set Qt directory variable
+      run: echo "QT_DIR=${{ github.workspace }}/Qt" >> $GITHUB_ENV
+
     - name: Cache Qt
       id: cache-qt
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/Qt
+        path: ${{ env.QT_DIR }}
         key: ${{ runner.os }}-QtCache
 
     - name: Install Qt
       if: steps.cache-qt.outputs.cache-hit != 'true'
       uses: jurplel/install-qt-action@v2
       with:
-        dir: ${{ github.workspace }}/Qt
-        version: '5.15.13'  # Specify the desired version
+        dir: ${{ env.QT_DIR }}
+        version: '5.15.2'  # Specify the desired version
         host: 'linux'      # Specify the host platform
         target: 'desktop'
         install-deps: 'true'
