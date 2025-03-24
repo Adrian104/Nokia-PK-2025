@@ -19,8 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # - name: Install dependencies (p7zip)
-    #   run: sudo apt-get update && sudo apt-get install -y p7zip-full
+    - name: Install dependencies (p7zip)
+      run: sudo apt-get update && sudo apt-get install -y p7zip-full
 
 
     - name: Install Qt
@@ -31,8 +31,8 @@ jobs:
     - name: Build unit tests for BtsApplication
       run: make BtsApplicationUT
 
-    # - name: Run BtsApplication unit tests
-    #   run: ./BTS/Tests/Application/BtsApplicationUT
+    - name: Run BtsApplication unit tests
+      run: ./BTS/Tests/Application/BtsApplicationUT
 
     - name: Build unit tests for COMMON
       run: make COMMON_UT
