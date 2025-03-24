@@ -25,7 +25,7 @@ jobs:
 
     - name: Verify 7z installation
       run: |
-        7z --version
+        7z
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
