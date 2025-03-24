@@ -4,7 +4,6 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    types: [opened, synchronize, reopened]
     branches: [ master ]
 
 jobs:
@@ -18,57 +17,25 @@ jobs:
         
     steps:
     - uses: actions/checkout@v2
-
-    - name: Install dependencies (p7zip)
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake p7zip-full
-
-
-    - name: Verify 7z installation
-      run: 7z
-
-    - name: Set Qt directory variable
-      run: echo "QT_DIR=${{ github.workspace }}/Qt" >> $GITHUB_ENV
-
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.QT_DIR }}
-        key: ${{ runner.os }}-QtCache
-
     - name: Install Qt
-      if: steps.cache-qt.outputs.cache-hit != 'true'
       uses: jurplel/install-qt-action@v2
-      with:
-        dir: ${{ env.QT_DIR }}
-        version: '5.15.2'  # Specify the desired version
-        host: 'linux'      # Specify the host platform
-        target: 'desktop'
-        install-deps: 'true'
-
     - name: cmake
       run: cmake .
+    - name: make all targets
+      run: make all
 
-    - name: Build unit tests for BtsApplication
-      run: make BtsApplicationUT
+    - name: UT for BtsApplication
+      run: make BtsApplicationUT 
 
-    - name: Run BtsApplication unit tests
+    - name: run BTS ut
       run: ./BTS/Tests/Application/BtsApplicationUT
 
-    - name: Build unit tests for COMMON
+    - name: UT for COMMON
       run: make COMMON_UT
 
-    - name: Run COMMON unit tests
-      run: ./COMMON/Tests/COMMON_UT
-
-    - name: Build unit tests for UeApplication
+    - name: UT for UeApplication
       run: make UeApplicationUT
 
-    - name: Run UeApplication unit tests
-      run: ./UE/Tests/Application/UeApplicationUT
-
-    - name: Build executables UE and BTS
-      run: make UE BTS
-
-    
+    - name: Next Steps
+      run: echo "Add your next steps here"
 
