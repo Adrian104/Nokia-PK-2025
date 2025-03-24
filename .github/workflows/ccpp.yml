@@ -38,7 +38,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         dir: ${{ github.workspace }}/Qt
-        version: '5.15.2'  # Specify the desired version
+        version: '5.15.13'  # Specify the desired version
         host: 'linux'      # Specify the host platform
         target: 'desktop'
         install-deps: 'true'
