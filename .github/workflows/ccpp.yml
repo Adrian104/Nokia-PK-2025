@@ -22,29 +22,20 @@ jobs:
     - name: Install dependencies (p7zip)
       run: sudo apt-get update && sudo apt-get install -y build-essential cmake p7zip-full
 
-
     - name: Verify 7z installation
       run: 7z
 
-    - name: Set Qt directory variable
-      run: echo "QT_DIR=${{ github.workspace }}/Qt" >> $GITHUB_ENV
-
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.QT_DIR }}
-        key: ${{ runner.os }}-QtCache
+    - name: Clear Qt directory
+      run: |
+        if [ -d "${{ github.workspace }}/Qt" ]; then
+          echo "Clearing existing Qt directory..."
+          rm -rf "${{ github.workspace }}/Qt"
+        fi
 
     - name: Install Qt
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      uses: jurplel/install-qt-action@v2
-      with:
-        dir: ${{ env.QT_DIR }}
-        version: '5.15.2'  # Specify the desired version
-        host: 'linux'      # Specify the host platform
-        target: 'desktop'
-        install-deps: 'true'
+      run: |
+        echo "Installing Qt..."
+        jurplel/install-qt-action@v2
 
     - name: cmake
       run: cmake .
@@ -70,5 +61,5 @@ jobs:
     - name: Build executables UE and BTS
       run: make UE BTS
 
-    
+
 
