@@ -25,17 +25,8 @@ jobs:
     - name: Verify 7z installation
       run: 7z
 
-    - name: Clear Qt directory
-      run: |
-        if [ -d "${{ github.workspace }}/Qt" ]; then
-          echo "Clearing existing Qt directory..."
-          rm -rf "${{ github.workspace }}/Qt"
-        fi
-
     - name: Install Qt
-      run: |
-        echo "Installing Qt..."
-        jurplel/install-qt-action@v2
+      run: sudo apt-get install -y qtbase5-dev
 
     - name: cmake
       run: cmake .
