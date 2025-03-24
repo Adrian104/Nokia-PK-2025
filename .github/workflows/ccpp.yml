@@ -24,11 +24,23 @@ jobs:
 
 
     - name: Verify 7z installation
+      run: 7z
+
+    - name: Check if Qt is already installed
+      id: check-qt
       run: |
-        7z
+        if [ -d "$QT_DIR" ]; then
+          echo "Qt is already installed."
+          echo "::set-output name=qt-installed::true"
+        else
+          echo "Qt is not installed."
+          echo "::set-output name=qt-installed::false"
+        fi
 
     - name: Install Qt
+      if: steps.check-qt.outputs.qt-installed == 'false'
       uses: jurplel/install-qt-action@v2
+
     - name: cmake
       run: cmake .
 
