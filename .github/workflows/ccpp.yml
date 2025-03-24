@@ -4,6 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
+    types: [opened, synchronize, reopened]
     branches: [ master ]
 
 jobs:
@@ -17,25 +18,36 @@ jobs:
         
     steps:
     - uses: actions/checkout@v2
+
+    # - name: Install dependencies (p7zip)
+    #   run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: cmake
       run: cmake .
-    - name: make all targets
-      run: make all
 
-    - name: UT for BtsApplication
-      run: make BtsApplicationUT 
+    - name: Build unit tests for BtsApplication
+      run: make BtsApplicationUT
 
-    - name: run BTS ut
-      run: ./BTS/Tests/Application/BtsApplicationUT
+    # - name: Run BtsApplication unit tests
+    #   run: ./BTS/Tests/Application/BtsApplicationUT
 
-    - name: UT for COMMON
+    - name: Build unit tests for COMMON
       run: make COMMON_UT
 
-    - name: UT for UeApplication
+    - name: Run COMMON unit tests
+      run: ./COMMON/Tests/COMMON_UT
+
+    - name: Build unit tests for UeApplication
       run: make UeApplicationUT
 
-    - name: Next Steps
-      run: echo "Add your next steps here"
+    - name: Run UeApplication unit tests
+      run: ./UE/Tests/Application/UeApplicationUT
+
+    - name: Build executables UE and BTS
+      run: make UE BTS
+
+    
 
