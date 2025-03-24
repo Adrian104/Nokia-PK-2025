@@ -29,7 +29,7 @@ jobs:
       run: |
         if [ -d "${{ github.workspace }}/Qt" ]; then
           echo "Clearing existing Qt directory..."
-          rm -rf "${{ github.workspace }}/Qt"
+          rm -rf "${{ github.workspace }}/Qt/*"
         fi
 
     - name: Install Qt
