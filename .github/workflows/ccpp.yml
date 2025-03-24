@@ -33,9 +33,7 @@ jobs:
         fi
 
     - name: Install Qt
-      run: |
-        echo "Installing Qt..."
-        jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v2
 
     - name: cmake
       run: cmake .
