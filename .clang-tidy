@@ -9,9 +9,9 @@ Checks: >
   -cppcoreguidelines-avoid-const-or-ref-data-members,
   -modernize-use-override
 
-WarningsAsErrors: ''        # Nie traktujemy ostrzeżeń jako błędów
+WarningsAsErrors: ''
 
-FormatStyle: 'file'         # Styl formatowania kodu zgodny z plikiem .clang-format
+FormatStyle: 'file'
 
 CheckOptions:
   - key: readability-identifier-naming.ClassCase
