@@ -26,20 +26,22 @@ jobs:
     - name: Verify 7z installation
       run: 7z
 
-    - name: Check if Qt is already installed
-      id: check-qt
-      run: |
-        if [ -d "$QT_DIR" ]; then
-          echo "Qt is already installed."
-          echo "::set-output name=qt-installed::true"
-        else
-          echo "Qt is not installed."
-          echo "::set-output name=qt-installed::false"
-        fi
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/Qt
+        key: ${{ runner.os }}-QtCache
 
     - name: Install Qt
-      if: steps.check-qt.outputs.qt-installed == 'false'
+      if: steps.cache-qt.outputs.cache-hit != 'true'
       uses: jurplel/install-qt-action@v2
+      with:
+        dir: ${{ github.workspace }}/Qt
+        version: '5.15.2'  # Specify the desired version
+        host: 'linux'      # Specify the host platform
+        target: 'desktop'
+        install-deps: 'true'
 
     - name: cmake
       run: cmake .
