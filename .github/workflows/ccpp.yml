@@ -19,11 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install dependencies (p7zip)
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake p7zip-full
-
-    - name: Verify 7z installation
-      run: 7z
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
 
     - name: Install Qt
       run: sudo apt-get install -y qtbase5-dev
