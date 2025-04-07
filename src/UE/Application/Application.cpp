@@ -9,8 +9,7 @@ Application::Application(common::PhoneNumber phoneNumber,
                          IBtsPort &bts,
                          IUserPort &user,
                          ITimerPort &timer)
-    : context{iLogger, bts, user, timer},
-      logger(iLogger, "[APP] ")
+    : context{iLogger, bts, user, timer}, logger(iLogger, "[APP] ")
 {
     logger.logInfo("Started");
     context.setState<NotConnectedState>();
@@ -39,6 +38,11 @@ void Application::handleAttachAccept()
 void Application::handleAttachReject()
 {
     context.state->handleAttachReject();
+}
+
+void Application::handleDisconnect()
+{
+    context.state->handleDisconnect();
 }
 
 }

@@ -21,3 +21,6 @@ Aby przeprowadzić proces kompilacji, należy wpisać polecenia:
 5. Wchodzimy do katalogu z plikami budowania `cd build`
 6. Budujemy za pomocą `make -j $(nproc)`
 7. Projekt zbudowany, można uruchomić programy.
+
+## Uruchamianie
+- Programy UE i BTS uruchomione ze zmienną środowiskową `DO_NOT_LOG_TO_FILE=1` będą logować tylko do konsoli, bez tworzenia plików.

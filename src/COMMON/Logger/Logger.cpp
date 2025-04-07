@@ -9,7 +9,9 @@ namespace common
 Logger::Logger(std::ostream& logfile)
     : Logger(
         {
-            {"[DEBUG]", {&logfile}},
+            {"[DEBUG]", {
+                ((std::getenv("DO_NOT_LOG_TO_FILE") != nullptr) &&
+                 (std::string(std::getenv("DO_NOT_LOG_TO_FILE")) == "1")) ? &std::cout : &logfile}},
             {"", {&std::cout, &logfile}},
             {"[ERROR]", {&std::cerr, &logfile}}
         })
