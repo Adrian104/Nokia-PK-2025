@@ -2,6 +2,7 @@
 
 #include "Logger/PrefixedLogger.hpp"
 #include "Messages/PhoneNumber.hpp"
+#include "Messages/IncomingMessage.hpp"
 #include "IEventsHandler.hpp"
 #include "Context.hpp"
 
@@ -29,6 +30,12 @@ public:
     void handleAttachAccept() override;
     void handleAttachReject() override;
     void handleDisconnect() override;
+    void handleIncomingSMS(
+        common::MessageId msgId,
+        common::PhoneNumber from,
+        common::PhoneNumber to,
+        const std::string& text
+    ) override;
 
 private:
     Context context;

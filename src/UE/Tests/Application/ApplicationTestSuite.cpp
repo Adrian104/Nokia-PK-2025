@@ -71,6 +71,11 @@ struct ApplicationConnectingTestSuite : ApplicationNotConnectedTestSuite
         EXPECT_CALL(userPortMock, showConnected());
         objectUnderTest.handleAttachAccept();
     }
+
+    void handleIncomingSMS(common::MessageId msgId,
+                           common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string& text) {}
 };
 
 TEST_F(ApplicationConnectingTestSuite, shallConnectOnAttachAccept)

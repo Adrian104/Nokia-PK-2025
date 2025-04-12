@@ -21,6 +21,10 @@ public:
     void handleAttachAccept() override;
     void handleAttachReject() override;
     void handleDisconnect() override;
+    void handleIncomingSMS(common::MessageId msgId,
+                           common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string& text) override;
 
 protected:
     Context& context;
