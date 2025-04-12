@@ -11,7 +11,7 @@ namespace ue
 struct Context
 {
     common::PrefixedLogger logger;
-    SmsDB smsdb;
+    SmsDB smsdb; // SMS database
     IBtsPort &bts;
     IUserPort &user;
     ITimerPort &timer;

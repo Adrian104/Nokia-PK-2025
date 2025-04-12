@@ -18,7 +18,7 @@ public:
     void showNotConnected() override;
     void showConnecting() override;
     void showConnected() override;
-    void showNewMessageIndicator() override;
+    void showNewMessageIndicator() override; // Highlights "M" in the top left corner of the phone
 
 private:
     common::PrefixedLogger logger;
