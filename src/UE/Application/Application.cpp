@@ -53,4 +53,14 @@ void Application::handleIncomingSMS(common::MessageId msgId,
     context.state->handleIncomingSMS(msgId, from, to, text);
 }
 
+void Application::handleViewSmsList()
+{
+    context.state->handleViewSmsList();
+}
+
+void Application::handleViewSms(SmsRecord& sms)
+{
+    context.state->handleViewSms(sms);
+}
+
 }

@@ -107,12 +107,38 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
     {
         handleAttachAccept();
     }
+
+    void handleViewSmsList()
+    {
+        EXPECT_CALL(userPortMock, showSmsList(_));
+        objectUnderTest.handleViewSmsList();
+    }
+
+    void handleViewSms(SmsRecord& sms)
+    {
+        EXPECT_CALL(userPortMock, showSms(_));
+        objectUnderTest.handleViewSms(sms);
+    }
 };
 
 TEST_F(ApplicationConnectedTestSuite, shallHandleDisconnectWhileConnected)
 {
     EXPECT_CALL(userPortMock, showNotConnected());
     objectUnderTest.handleDisconnect();
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleViewSmsList)
+{
+    handleViewSmsList();
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleViewSms)
+{
+    SmsRecord sms;
+    sms.m_from = common::PhoneNumber{1};
+    sms.m_to = common::PhoneNumber{123};
+    sms.m_message = "a";
+    handleViewSms(sms);
 }
 
 }

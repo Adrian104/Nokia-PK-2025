@@ -19,6 +19,8 @@ public:
     void showConnecting() override;
     void showConnected() override;
     void showNewMessageIndicator() override; // Highlights "M" in the top left corner of the phone
+    void showSmsList(SmsDB& smsdb) override; // Shows the SMS list view screen
+    void showSms(SmsRecord& sms) override; // Shows the SMS view screen
 
 private:
     common::PrefixedLogger logger;

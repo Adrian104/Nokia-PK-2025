@@ -36,6 +36,8 @@ public:
         common::PhoneNumber to,
         const std::string& text
     ) override;
+    void handleViewSmsList() override;
+    void handleViewSms(SmsRecord& sms) override;
 
 private:
     Context context;

@@ -48,4 +48,14 @@ void BaseState::handleIncomingSMS(common::MessageId msgId,
     logger.logError("Uexpected: handleIncomingSMS");
 }
 
+void BaseState::handleViewSmsList()
+{
+    logger.logError("Uexpected: handleViewSms");
+}
+
+void BaseState::handleViewSms(SmsRecord& sms)
+{
+    logger.logError("Uexpected: handleViewSms");
+}
+
 }
