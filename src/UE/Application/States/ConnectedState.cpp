@@ -44,4 +44,21 @@ void ConnectedState::handleViewSms(SmsRecord& sms)
     context.user.showSms(sms);  
 }
 
+void ConnectedState::handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+{
+    context.logger.logInfo("Sending SMS to ", (int) to.value, ", SMS content: ", text);
+
+    context.smsdb.addSms(from, to, text);
+
+    if (!context.bts.sendSms(from, to, text))
+    {
+        context.smsdb.markLastSmsSentAsFailed();
+    }
+    else
+    {
+        context.user.showConnected();
+        //("SMS sent successfully");
+    }
+}
+
 }

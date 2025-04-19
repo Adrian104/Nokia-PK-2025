@@ -63,4 +63,9 @@ void Application::handleViewSms(SmsRecord& sms)
     context.state->handleViewSms(sms);
 }
 
+void Application::handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+{
+    context.state->handleSendSms(from, to, text);
+}
+
 }

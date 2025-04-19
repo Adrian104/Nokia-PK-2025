@@ -15,6 +15,12 @@ enum class SmsDir
 	UNKNOWN
 };
 
+enum class SmsStatus
+{
+	SUCCESS,
+	FAILED
+};
+
 // Each message is represented by SmsRecord
 struct SmsRecord
 {
@@ -23,6 +29,7 @@ struct SmsRecord
 	common::PhoneNumber m_from; // Phone number of sender
 	common::PhoneNumber m_to; // Phone number of receiver
 	std::string m_message; // Message of the SMS
+	SmsStatus m_status = SmsStatus::SUCCESS; // Status of the SMS
 };
 
 class SmsDB
@@ -33,6 +40,14 @@ public:
 		common::PhoneNumber from,
 		common::PhoneNumber to,
 		const std::string& message);
+
+	// Adds sent SMS to the database
+    void addSms(
+        common::PhoneNumber from,
+        common::PhoneNumber to,
+        const std::string& message);
+
+	void markLastSmsSentAsFailed();
 
 	// SmsDB has begin() and end(), so it can be easily iterated over all the messages in the database.
 	std::vector<SmsRecord>::iterator begin();

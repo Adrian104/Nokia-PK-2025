@@ -1,5 +1,6 @@
 #include "UserPort.hpp"
 #include "UeGui/IListViewMode.hpp"
+#include "UeGui/ISmsComposeMode.hpp"
 
 namespace ue
 {
@@ -50,6 +51,7 @@ void UserPort::showConnected()
         switch (selectedIndex)
         {
         case 0: // "Compose SMS"
+            showSmsComposeMode();
             break;
         case 1: // "View SMS"
             handler->handleViewSmsList();
@@ -107,6 +109,29 @@ void UserPort::showSms(SmsRecord& sms)
 
     gui.setRejectCallback([this]() {
         handler->handleViewSmsList();
+    });
+}
+
+void UserPort::showSmsComposeMode()
+{
+    IUeGui::ISmsComposeMode& composeMode = gui.setSmsComposeMode();
+
+    gui.setAcceptCallback([this, &composeMode]() {
+        auto to = composeMode.getPhoneNumber();
+        auto text = composeMode.getSmsText();
+
+        if (!to_string(to).empty() && !text.empty())
+        {
+            handler->handleSendSms(phoneNumber, to, text);
+        }
+        else
+        {
+            logger.logError("Invalid recipient or empty message");
+        }
+    });
+
+    gui.setRejectCallback([this]() {
+        showConnected();
     });
 }
 

@@ -90,5 +90,22 @@ void BtsPort::handleDisconnect()
         logger.logError("handleDisconnect: handler is nullptr");
 }
 
+bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+{
+    logger.logDebug("sendSms: from ", from.value, " to ", to.value, " text: ", text);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::Sms, from, to};
+        msg.writeText(text);
+        transport.sendMessage(msg.getMessage());
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        logger.logError("Failed to send SMS: ", e.what());
+        return false;
+    }
+}
 
 }
