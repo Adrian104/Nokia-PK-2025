@@ -19,6 +19,7 @@ public:
                                    common::PhoneNumber from,
                                    common::PhoneNumber to,
                                    const std::string& text) = 0;
+    virtual void handleSmsResponse(bool status) = 0;
 };
 
 class IBtsPort

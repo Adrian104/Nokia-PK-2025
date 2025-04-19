@@ -63,4 +63,10 @@ void BaseState::handleSendSms(const common::PhoneNumber& from, const common::Pho
     logger.logError("Uexpected: handleSendSms");
 }
 
+void BaseState::handleSmsResponse(bool status)
+{
+    logger.logError("Uexpected: handleSmsResponse");
+
+}
+
 }

@@ -53,11 +53,21 @@ void ConnectedState::handleSendSms(const common::PhoneNumber& from, const common
     if (!context.bts.sendSms(from, to, text))
     {
         context.smsdb.markLastSmsSentAsFailed();
+        context.logger.logInfo("Failed to send SMS to ", (int) to.value);
     }
     else
     {
         context.user.showConnected();
-        //("SMS sent successfully");
+        context.logger.logInfo("SMS sent successfully to BTS");
+    }
+}
+
+void ConnectedState::handleSmsResponse(bool status)
+{
+    if (!status)
+    {
+        context.smsdb.markLastSmsSentAsFailed();
+        context.logger.logError("SMS delivery failed - unknown recipient");
     }
 }
 

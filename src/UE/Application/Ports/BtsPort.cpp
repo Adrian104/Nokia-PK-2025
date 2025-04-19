@@ -57,6 +57,11 @@ void BtsPort::handleMessage(BinaryMessage msg)
             handler->handleIncomingSMS(msgId, from, to, text);
             break;
         }
+        case common::MessageId::UnknownRecipient:
+        {
+            handler->handleSmsResponse(0);
+            break;
+        }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
 
@@ -99,7 +104,7 @@ bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber
         common::OutgoingMessage msg{common::MessageId::Sms, from, to};
         msg.writeText(text);
         transport.sendMessage(msg.getMessage());
-        return true;
+        return true; // SMS sent successfully to BTS
     }
     catch (const std::exception& e)
     {

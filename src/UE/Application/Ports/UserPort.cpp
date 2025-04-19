@@ -101,6 +101,10 @@ void UserPort::showSms(SmsRecord& sms)
     IUeGui::IListViewMode& menu = gui.setListViewMode();
     menu.clearSelectionList();
 
+    if(sms.m_status == SmsStatus::FAILED)
+    {
+        menu.addSelectionListItem("Message failed\n to be delivered", "");
+    }
     menu.addSelectionListItem("From: " + std::to_string(sms.m_from.value), "");
     menu.addSelectionListItem("To: " + std::to_string(sms.m_to.value), "");
     menu.addSelectionListItem("Message: " + sms.m_message, "");
@@ -115,12 +119,13 @@ void UserPort::showSms(SmsRecord& sms)
 void UserPort::showSmsComposeMode()
 {
     IUeGui::ISmsComposeMode& composeMode = gui.setSmsComposeMode();
+    composeMode.clearSmsText();
 
     gui.setAcceptCallback([this, &composeMode]() {
         auto to = composeMode.getPhoneNumber();
         auto text = composeMode.getSmsText();
 
-        if (!to_string(to).empty() && !text.empty())
+        if (to.isValid() && !text.empty())
         {
             handler->handleSendSms(phoneNumber, to, text);
         }

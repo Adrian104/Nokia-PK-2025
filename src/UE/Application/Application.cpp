@@ -68,4 +68,10 @@ void Application::handleSendSms(const common::PhoneNumber& from, const common::P
     context.state->handleSendSms(from, to, text);
 }
 
+void Application::handleSmsResponse(bool status)
+{
+    context.state->handleSmsResponse(status);
+
+}
+
 }
