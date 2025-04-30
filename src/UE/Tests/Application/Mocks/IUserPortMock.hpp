@@ -13,6 +13,7 @@ public:
     ~IUserEventsHandlerMock() override;
     MOCK_METHOD(void, handleViewSmsList, (), (final)); 
     MOCK_METHOD(void, handleViewSms, (SmsRecord&), (final));
+    MOCK_METHOD(void, handleSendSms, (const common::PhoneNumber&, const common::PhoneNumber&, const std::string&), (final));
 
 };
 
@@ -28,6 +29,7 @@ public:
     MOCK_METHOD(void, showNewMessageIndicator, (), (final));
     MOCK_METHOD(void, showSmsList, (SmsDB&), (final));
     MOCK_METHOD(void, showSms, (SmsRecord&), (final));
+    MOCK_METHOD(void, showSmsComposeMode, (), (final));
 };
 
 }
