@@ -16,3 +16,5 @@ build
 *_autogen
 
 .idea
+*.kdev4
+src/.kdev
