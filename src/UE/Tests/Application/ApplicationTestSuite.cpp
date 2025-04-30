@@ -71,11 +71,6 @@ struct ApplicationConnectingTestSuite : ApplicationNotConnectedTestSuite
         EXPECT_CALL(userPortMock, showConnected());
         objectUnderTest.handleAttachAccept();
     }
-
-    void handleIncomingSMS(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
-                           const std::string& text) {}
 };
 
 TEST_F(ApplicationConnectingTestSuite, shallConnectOnAttachAccept)
@@ -119,6 +114,15 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
         EXPECT_CALL(userPortMock, showSms(_));
         objectUnderTest.handleViewSms(sms);
     }
+
+    void handleIncomingSMS(common::MessageId msgId,
+                           common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string& text)
+    {
+        EXPECT_CALL(userPortMock, showNewMessageIndicator());
+        objectUnderTest.handleIncomingSMS(msgId, from, to, text);
+    }
 };
 
 TEST_F(ApplicationConnectedTestSuite, shallHandleDisconnectWhileConnected)
@@ -139,6 +143,15 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleViewSms)
     sms.m_to = common::PhoneNumber{123};
     sms.m_message = "a";
     handleViewSms(sms);
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleReceiveSms)
+{
+    common::MessageId id{42};
+    common::PhoneNumber from{123};
+    common::PhoneNumber to{222};
+    std::string txt("Hello!");
+    handleIncomingSMS(id, from, to, txt);
 }
 
 }
