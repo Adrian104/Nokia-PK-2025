@@ -123,6 +123,14 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
         EXPECT_CALL(userPortMock, showNewMessageIndicator());
         objectUnderTest.handleIncomingSMS(msgId, from, to, text);
     }
+
+    void handleSendSms(common::PhoneNumber from,
+                       common::PhoneNumber to,
+                       const std::string &text)
+    {
+        EXPECT_CALL(btsPortMock, sendSms(_, _, _));
+        objectUnderTest.handleSendSms(from, to, text);
+    }
 };
 
 TEST_F(ApplicationConnectedTestSuite, shallHandleDisconnectWhileConnected)
@@ -154,4 +162,11 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleReceiveSms)
     handleIncomingSMS(id, from, to, txt);
 }
 
+TEST_F(ApplicationConnectedTestSuite, shallHandleSendSms)
+{
+    common::PhoneNumber from{31};
+    common::PhoneNumber to{222};
+    std::string text("test");
+    handleSendSms(from, to, text);
+}
 }

@@ -19,6 +19,7 @@ protected:
     StrictMock<IUserEventsHandlerMock> handlerMock;
     StrictMock<IUeGuiMock> guiMock;
     StrictMock<IListViewModeMock> listViewModeMock;
+    StrictMock<ISmsComposeModeMock> smsComposeModeMock;
 
     UserPort objectUnderTest{loggerMock, guiMock, PHONE_NUMBER};
 
@@ -79,6 +80,15 @@ TEST_F(UserPortTestSuite, shallShowSms)
     EXPECT_CALL(guiMock, setAcceptCallback(_));
     EXPECT_CALL(guiMock, setRejectCallback(_));
     objectUnderTest.showSms(sms);
+}
+
+TEST_F(UserPortTestSuite, shallshowSmsComposeMode)
+{
+    EXPECT_CALL(guiMock, setSmsComposeMode()).WillOnce(ReturnRef(smsComposeModeMock));
+    EXPECT_CALL(smsComposeModeMock, clearSmsText());
+    EXPECT_CALL(guiMock, setAcceptCallback(_));
+    EXPECT_CALL(guiMock, setRejectCallback(_));
+    objectUnderTest.showSmsComposeMode();
 }
 
 }
