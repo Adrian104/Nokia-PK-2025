@@ -45,4 +45,33 @@ void Application::handleDisconnect()
     context.state->handleDisconnect();
 }
 
+void Application::handleIncomingSMS(common::MessageId msgId,
+                                    common::PhoneNumber from,
+                                    common::PhoneNumber to,
+                                    const std::string& text)
+{
+    context.state->handleIncomingSMS(msgId, from, to, text);
+}
+
+void Application::handleViewSmsList()
+{
+    context.state->handleViewSmsList();
+}
+
+void Application::handleViewSms(SmsRecord& sms)
+{
+    context.state->handleViewSms(sms);
+}
+
+void Application::handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+{
+    context.state->handleSendSms(from, to, text);
+}
+
+void Application::handleSmsResponse(bool status)
+{
+    context.state->handleSmsResponse(status);
+
+}
+
 }

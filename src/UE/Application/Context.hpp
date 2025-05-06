@@ -2,6 +2,7 @@
 
 #include "IEventsHandler.hpp"
 #include "Logger/PrefixedLogger.hpp"
+#include "SmsDB.hpp"
 #include <memory>
 
 namespace ue
@@ -10,6 +11,7 @@ namespace ue
 struct Context
 {
     common::PrefixedLogger logger;
+    SmsDB smsdb; // SMS database
     IBtsPort &bts;
     IUserPort &user;
     ITimerPort &timer;

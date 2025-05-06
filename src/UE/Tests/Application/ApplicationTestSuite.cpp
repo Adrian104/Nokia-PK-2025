@@ -102,6 +102,35 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
     {
         handleAttachAccept();
     }
+
+    void handleViewSmsList()
+    {
+        EXPECT_CALL(userPortMock, showSmsList(_));
+        objectUnderTest.handleViewSmsList();
+    }
+
+    void handleViewSms(SmsRecord& sms)
+    {
+        EXPECT_CALL(userPortMock, showSms(_));
+        objectUnderTest.handleViewSms(sms);
+    }
+
+    void handleIncomingSMS(common::MessageId msgId,
+                           common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string& text)
+    {
+        EXPECT_CALL(userPortMock, showNewMessageIndicator());
+        objectUnderTest.handleIncomingSMS(msgId, from, to, text);
+    }
+
+    void handleSendSms(common::PhoneNumber from,
+                       common::PhoneNumber to,
+                       const std::string &text)
+    {
+        EXPECT_CALL(btsPortMock, sendSms(_, _, _));
+        objectUnderTest.handleSendSms(from, to, text);
+    }
 };
 
 TEST_F(ApplicationConnectedTestSuite, shallHandleDisconnectWhileConnected)
@@ -110,4 +139,34 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleDisconnectWhileConnected)
     objectUnderTest.handleDisconnect();
 }
 
+TEST_F(ApplicationConnectedTestSuite, shallHandleViewSmsList)
+{
+    handleViewSmsList();
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleViewSms)
+{
+    SmsRecord sms;
+    sms.m_from = common::PhoneNumber{1};
+    sms.m_to = common::PhoneNumber{123};
+    sms.m_message = "a";
+    handleViewSms(sms);
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleReceiveSms)
+{
+    common::MessageId id{42};
+    common::PhoneNumber from{123};
+    common::PhoneNumber to{222};
+    std::string txt("Hello!");
+    handleIncomingSMS(id, from, to, txt);
+}
+
+TEST_F(ApplicationConnectedTestSuite, shallHandleSendSms)
+{
+    common::PhoneNumber from{31};
+    common::PhoneNumber to{222};
+    std::string text("test");
+    handleSendSms(from, to, text);
+}
 }

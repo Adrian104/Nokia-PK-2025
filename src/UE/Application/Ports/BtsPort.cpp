@@ -51,6 +51,17 @@ void BtsPort::handleMessage(BinaryMessage msg)
                 handler->handleAttachReject();
             break;
         }
+        case common::MessageId::Sms:
+        {
+            const std::string& text = reader.readRemainingText();
+            handler->handleIncomingSMS(msgId, from, to, text);
+            break;
+        }
+        case common::MessageId::UnknownRecipient:
+        {
+            handler->handleSmsResponse(0);
+            break;
+        }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
 
@@ -84,5 +95,22 @@ void BtsPort::handleDisconnect()
         logger.logError("handleDisconnect: handler is nullptr");
 }
 
+bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+{
+    logger.logDebug("sendSms: from ", from.value, " to ", to.value, " text: ", text);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::Sms, from, to};
+        msg.writeText(text);
+        transport.sendMessage(msg.getMessage());
+        return true; // SMS sent successfully to BTS
+    }
+    catch (const std::exception& e)
+    {
+        logger.logError("Failed to send SMS: ", e.what());
+        return false;
+    }
+}
 
 }
