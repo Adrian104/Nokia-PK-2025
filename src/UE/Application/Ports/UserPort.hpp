@@ -23,6 +23,8 @@ public:
     void showSms(SmsRecord& sms) override; // Shows the SMS view screen
     void showSmsComposeMode() override; // Shows the SMS compose mode screen
     void showIncomingCall(common::PhoneNumber from, common::PhoneNumber to) override;
+    void showTalk(common::PhoneNumber from, common::PhoneNumber to) override;
+    void showUnknownRecipient(common::PhoneNumber number) override;
 
 private:
     common::PrefixedLogger logger;

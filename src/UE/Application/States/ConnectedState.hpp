@@ -24,6 +24,8 @@ public:
     void handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text) override;
     void handleSmsResponse(bool status) override;
     void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleUnknownRecipient() override;
 
 private:
     common::PhoneNumber m_callingNumber;

@@ -1,6 +1,7 @@
 #include "ConnectedState.hpp"
 
 #include "NotConnectedState.hpp"
+#include "TalkingState.hpp"
 
 namespace ue
 {
@@ -99,6 +100,18 @@ void ConnectedState::handleCallDrop(common::PhoneNumber from, common::PhoneNumbe
     m_ringing = false;
     context.timer.stopTimer();
     context.bts.sendCallDrop(from, to);
+}
+
+void ConnectedState::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+{
+    m_ringing = false;
+    context.timer.stopTimer();
+    context.setState<TalkingState>(from, to);
+}
+
+void ConnectedState::handleUnknownRecipient()
+{
+    handleSmsResponse(!m_ringing);
 }
 
 }

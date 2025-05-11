@@ -87,4 +87,14 @@ void Application::handleCallDrop(common::PhoneNumber from, common::PhoneNumber t
     context.state->handleCallDrop(from, to);
 }
 
+void Application::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+{
+    context.state->handleCallAccept(from, to);
+}
+
+void Application::handleUnknownRecipient()
+{
+    context.state->handleUnknownRecipient();
+}
+
 }

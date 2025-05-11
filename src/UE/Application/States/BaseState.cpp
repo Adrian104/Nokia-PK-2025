@@ -82,4 +82,14 @@ void BaseState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
     logger.logError("Uexpected: handleCallDrop");
 }
 
+void BaseState::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+{
+    logger.logError("Uexpected: handleCallAccept");
+}
+
+void BaseState::handleUnknownRecipient()
+{
+    logger.logError("Uexpected: handleUnknownRecipient");
+}
+
 }

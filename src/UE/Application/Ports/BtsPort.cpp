@@ -59,7 +59,7 @@ void BtsPort::handleMessage(BinaryMessage msg)
         }
         case common::MessageId::UnknownRecipient:
         {
-            handler->handleSmsResponse(0);
+            handler->handleUnknownRecipient();
             break;
         }
         case common::MessageId::CallRequest:
@@ -132,6 +132,23 @@ bool BtsPort::sendCallDrop(common::PhoneNumber from, common::PhoneNumber to)
     catch (const std::exception& e)
     {
         logger.logError("Failed to send call drop: ", e.what());
+        return false;
+    }
+}
+
+bool BtsPort::sendCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+{
+    logger.logDebug("sendCallAccept: from ", from, " to ", to);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::CallAccepted, to, from};
+        transport.sendMessage(msg.getMessage());
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        logger.logError("Failed to send call accept: ", e.what());
         return false;
     }
 }

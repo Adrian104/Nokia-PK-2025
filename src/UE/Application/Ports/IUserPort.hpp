@@ -12,6 +12,7 @@ public:
     virtual void handleViewSms(SmsRecord& sms) = 0;
     virtual void handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text) = 0;
     virtual void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) = 0;
+    virtual void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) = 0;
 };
 
 class IUserPort
@@ -27,6 +28,8 @@ public:
     virtual void showSms(SmsRecord& sms) = 0; // Shows the SMS view screen
     virtual void showSmsComposeMode() = 0;
     virtual void showIncomingCall(common::PhoneNumber from, common::PhoneNumber to) = 0;
+    virtual void showTalk(common::PhoneNumber from, common::PhoneNumber to) = 0;
+    virtual void showUnknownRecipient(common::PhoneNumber number) = 0;
 };
 
 }
