@@ -48,6 +48,14 @@ void BaseState::handleIncomingSMS(common::MessageId msgId,
     logger.logError("Uexpected: handleIncomingSMS");
 }
 
+void BaseState::handleCallRequest(common::MessageId msgId,
+                       common::PhoneNumber from,
+                       common::PhoneNumber to,
+                       const std::string& enc)
+{
+    logger.logError("Uexpected: handleCallRequest");
+}
+
 void BaseState::handleViewSmsList()
 {
     logger.logError("Uexpected: handleViewSms");

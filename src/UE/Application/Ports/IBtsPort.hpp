@@ -19,6 +19,10 @@ public:
                                    common::PhoneNumber from,
                                    common::PhoneNumber to,
                                    const std::string& text) = 0;
+    virtual void handleCallRequest(common::MessageId msgId,
+                                   common::PhoneNumber from,
+                                   common::PhoneNumber to,
+                                   const std::string& enc) = 0;
     virtual void handleSmsResponse(bool status) = 0;
 };
 

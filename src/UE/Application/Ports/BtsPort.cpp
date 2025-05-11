@@ -62,6 +62,12 @@ void BtsPort::handleMessage(BinaryMessage msg)
             handler->handleSmsResponse(0);
             break;
         }
+        case common::MessageId::CallRequest:
+        {
+            const std::string& encryptionData = reader.readRemainingText();
+            handler->handleCallRequest(msgId, from, to, encryptionData);
+            break;
+        }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
 

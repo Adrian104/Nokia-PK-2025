@@ -53,6 +53,14 @@ void Application::handleIncomingSMS(common::MessageId msgId,
     context.state->handleIncomingSMS(msgId, from, to, text);
 }
 
+void Application::handleCallRequest(common::MessageId msgId,
+                       common::PhoneNumber from,
+                       common::PhoneNumber to,
+                       const std::string& enc)
+{
+    context.state->handleCallRequest(msgId, from, to, enc);
+}
+
 void Application::handleViewSmsList()
 {
     context.state->handleViewSmsList();
