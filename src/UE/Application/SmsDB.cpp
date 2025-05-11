@@ -14,7 +14,7 @@ void SmsDB::addReceivedSms(
 	sms.m_to = to;
 	sms.m_message = message;
 
-	m_database.emplace_back(std::move(sms));
+	m_database.push_back(std::move(sms));
 }
 
 void SmsDB::addSms(
@@ -29,7 +29,7 @@ void SmsDB::addSms(
     sms.m_to = to;
     sms.m_message = message;
 
-    m_database.emplace_back(std::move(sms));
+    m_database.push_back(std::move(sms));
 }
 
 void SmsDB::markLastSmsSentAsFailed()
