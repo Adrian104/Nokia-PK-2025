@@ -1,6 +1,9 @@
 #include "UserPort.hpp"
 #include "UeGui/IListViewMode.hpp"
 #include "UeGui/ISmsComposeMode.hpp"
+#include "UeGui/ICallMode.hpp"
+#include "UeGui/IDialMode.hpp"
+#include "UeGui/ITextMode.hpp"
 
 namespace ue
 {
@@ -136,6 +139,21 @@ void UserPort::showSmsComposeMode()
     });
 
     gui.setRejectCallback([this]() {
+        showConnected();
+    });
+}
+
+void UserPort::showIncomingCall(common::PhoneNumber from, common::PhoneNumber to)
+{
+    const std::string info = "Incoming call\nfrom: " + std::to_string(from.value);
+    gui.setAlertMode().setText(info);
+
+    gui.setAcceptCallback([]() -> void {
+        // TODO
+    });
+
+    gui.setRejectCallback([this, from, to]() -> void {
+        handler->handleCallDrop(from, to);
         showConnected();
     });
 }

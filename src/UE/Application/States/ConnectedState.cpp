@@ -11,6 +11,16 @@ ConnectedState::ConnectedState(Context &context)
     context.user.showConnected();
 }
 
+void ConnectedState::handleTimeout()
+{
+    if (m_ringing)
+    {
+        m_ringing = false;
+        context.bts.sendCallDrop(m_callingNumber, m_myNumber);
+        context.user.showConnected();
+    }
+}
+
 void ConnectedState::handleDisconnect()
 {
     context.setState<NotConnectedState>();
@@ -27,6 +37,19 @@ void ConnectedState::handleIncomingSMS(common::MessageId msgId,
     logger.logInfo(log);
     context.smsdb.addReceivedSms(from, to, text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
     context.user.showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+}
+
+void ConnectedState::handleCallRequest(common::MessageId msgId,
+                       common::PhoneNumber from,
+                       common::PhoneNumber to,
+                       const std::string& enc)
+{
+    m_myNumber = to;
+    m_callingNumber = from;
+    m_ringing = true;
+
+    context.user.showIncomingCall(from, to);
+    context.timer.startTimer(std::chrono::seconds(30));
 }
 
 void ConnectedState::handleViewSmsList()
@@ -69,6 +92,13 @@ void ConnectedState::handleSmsResponse(bool status)
         context.smsdb.markLastSmsSentAsFailed();
         context.logger.logError("SMS delivery failed - unknown recipient");
     }
+}
+
+void ConnectedState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+{
+    m_ringing = false;
+    context.timer.stopTimer();
+    context.bts.sendCallDrop(from, to);
 }
 
 }

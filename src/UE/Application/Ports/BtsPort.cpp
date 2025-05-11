@@ -119,4 +119,21 @@ bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber
     }
 }
 
+bool BtsPort::sendCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+{
+    logger.logDebug("sendCallDrop: from ", from, " to ", to);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::CallDropped, to, from};
+        transport.sendMessage(msg.getMessage());
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        logger.logError("Failed to send call drop: ", e.what());
+        return false;
+    }
+}
+
 }

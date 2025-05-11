@@ -82,4 +82,9 @@ void Application::handleSmsResponse(bool status)
 
 }
 
+void Application::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+{
+    context.state->handleCallDrop(from, to);
+}
+
 }

@@ -77,4 +77,9 @@ void BaseState::handleSmsResponse(bool status)
 
 }
 
+void BaseState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+{
+    logger.logError("Uexpected: handleCallDrop");
+}
+
 }
