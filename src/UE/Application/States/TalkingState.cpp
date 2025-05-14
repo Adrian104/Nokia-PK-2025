@@ -1,4 +1,5 @@
 #include "TalkingState.hpp"
+#include <iostream>
 
 namespace ue
 {
@@ -8,6 +9,7 @@ TalkingState::TalkingState(Context &context, common::PhoneNumber from, common::P
 {
     context.bts.sendCallAccept(from, to);
     context.user.showTalk(from, to);
+    context.timer.startTimer(std::chrono::seconds(120));
 }
 
 void TalkingState::handleUnknownRecipient()
@@ -20,8 +22,23 @@ void TalkingState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber 
     context.user.showConnected();
 }
 
-void TalkingState::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+void TalkingState::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
 {
+    context.user.addCallMessage(from, to, message);
+
+    context.timer.startTimer(std::chrono::seconds(120));
+}
+
+void TalkingState::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+{
+    context.bts.sendCallTalk(from, to, message);
+    
+    context.timer.startTimer(std::chrono::seconds(120));
+}
+
+void TalkingState::handleTimeout()
+{
+    context.bts.sendCallDrop(m_to, m_from); //(myPhoneNumber, partnerPhoneNumber)
     context.user.showConnected();
 }
 

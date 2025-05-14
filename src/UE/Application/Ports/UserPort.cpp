@@ -160,7 +160,23 @@ void UserPort::showIncomingCall(common::PhoneNumber from, common::PhoneNumber to
 
 void UserPort::showTalk(common::PhoneNumber from, common::PhoneNumber to)
 {
-    gui.setCallMode();
+    IUeGui::ICallMode& callMode = gui.setCallMode();
+
+    gui.setAcceptCallback([this, &callMode, to, from]() {
+        std::string outgoingMessage = callMode.getOutgoingText();
+        if (!outgoingMessage.empty())
+        {
+            callMode.appendIncomingText(std::to_string(to.value) + ": " + outgoingMessage);
+            handler->handleSendCallTalk(phoneNumber, from, outgoingMessage);
+            callMode.clearOutgoingText();
+        }
+    });
+}
+
+void UserPort::addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+{
+    IUeGui::ICallMode& callMode = gui.setCallMode();
+    callMode.appendIncomingText(std::to_string(from.value) + ": " + message);
 }
 
 void UserPort::showUnknownRecipient(common::PhoneNumber number)

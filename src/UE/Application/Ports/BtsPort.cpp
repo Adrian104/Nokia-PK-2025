@@ -68,6 +68,12 @@ void BtsPort::handleMessage(BinaryMessage msg)
             handler->handleCallRequest(msgId, from, to, encryptionData);
             break;
         }
+        case common::MessageId::CallTalk:
+        {
+            const std::string& text = reader.readRemainingText();
+            handler->handleCallTalk(msgId, from, to, text);
+            break;
+        }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
 
@@ -151,6 +157,25 @@ bool BtsPort::sendCallAccept(common::PhoneNumber from, common::PhoneNumber to)
         logger.logError("Failed to send call accept: ", e.what());
         return false;
     }
+}
+
+bool BtsPort::sendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+{
+    logger.logDebug("sendCallTalk: from ", from, " to ", to);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::CallTalk, from, to};
+        msg.writeText(message);
+        transport.sendMessage(msg.getMessage());
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        logger.logError("Failed to send call talk: ", e.what());
+        return false;
+    }
+
 }
 
 }

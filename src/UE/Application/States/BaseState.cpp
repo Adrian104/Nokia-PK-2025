@@ -92,4 +92,14 @@ void BaseState::handleUnknownRecipient()
     logger.logError("Uexpected: handleUnknownRecipient");
 }
 
+void BaseState::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+{
+    logger.logError("Uexpected: handleCallTalk");
+}
+
+void BaseState::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+{
+    logger.logError("Uexpected: handleSendCallTalk");
+}
+
 }
