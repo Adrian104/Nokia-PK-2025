@@ -14,6 +14,8 @@ public:
     MOCK_METHOD(void, handleViewSmsList, (), (final)); 
     MOCK_METHOD(void, handleViewSms, (SmsRecord&), (final));
     MOCK_METHOD(void, handleSendSms, (const common::PhoneNumber&, const common::PhoneNumber&, const std::string&), (final));
+    MOCK_METHOD(void, handleCallDrop, (common::PhoneNumber, common::PhoneNumber), (final));
+    MOCK_METHOD(void, handleCallAccept, (common::PhoneNumber, common::PhoneNumber), (final));
 
 };
 
@@ -30,6 +32,9 @@ public:
     MOCK_METHOD(void, showSmsList, (SmsDB&), (final));
     MOCK_METHOD(void, showSms, (SmsRecord&), (final));
     MOCK_METHOD(void, showSmsComposeMode, (), (final));
+    MOCK_METHOD(void, showIncomingCall, (common::PhoneNumber, common::PhoneNumber), (final));
+    MOCK_METHOD(void, showTalk, (common::PhoneNumber, common::PhoneNumber), (final));
+    MOCK_METHOD(void, showUnknownRecipient, (common::PhoneNumber), (final));
 };
 
 }
