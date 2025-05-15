@@ -97,4 +97,14 @@ void Application::handleUnknownRecipient()
     context.state->handleUnknownRecipient();
 }
 
+void Application::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+{
+    context.state->handleCallTalk(msgId, from, to, message);
+}
+
+void Application::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+{
+    context.state->handleSendCallTalk(from, to, message);
+}
+
 }
