@@ -161,6 +161,7 @@ void UserPort::showIncomingCall(common::PhoneNumber from, common::PhoneNumber to
 void UserPort::showTalk(common::PhoneNumber from, common::PhoneNumber to)
 {
     IUeGui::ICallMode& callMode = gui.setCallMode();
+    callMode.clearIncomingText();
 
     gui.setAcceptCallback([this, &callMode, to, from]() {
         std::string outgoingMessage = callMode.getOutgoingText();
@@ -170,6 +171,9 @@ void UserPort::showTalk(common::PhoneNumber from, common::PhoneNumber to)
             handler->handleSendCallTalk(phoneNumber, from, outgoingMessage);
             callMode.clearOutgoingText();
         }
+    });
+    gui.setRejectCallback([this, from, to]() -> void {
+        
     });
 }
 
@@ -182,6 +186,9 @@ void UserPort::addCallMessage(common::PhoneNumber from, common::PhoneNumber to, 
 void UserPort::showUnknownRecipient(common::PhoneNumber number)
 {
     gui.showPeerUserNotAvailable(number);
+    gui.setRejectCallback([this]() -> void {
+        showConnected();
+    });
 }
 
 }
