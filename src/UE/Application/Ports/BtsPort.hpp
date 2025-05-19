@@ -19,6 +19,7 @@ public:
     bool sendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text) override;
     bool sendCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
     bool sendCallAccept(common::PhoneNumber from, common::PhoneNumber to) override;
+    bool sendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
 
 private:
     void handleMessage(BinaryMessage msg);

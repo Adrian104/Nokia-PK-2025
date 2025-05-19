@@ -24,6 +24,7 @@ public:
     void showSmsComposeMode() override; // Shows the SMS compose mode screen
     void showIncomingCall(common::PhoneNumber from, common::PhoneNumber to) override;
     void showTalk(common::PhoneNumber from, common::PhoneNumber to) override;
+    void addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
     void showUnknownRecipient(common::PhoneNumber number) override;
 
 private:
