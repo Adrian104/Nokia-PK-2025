@@ -1,6 +1,7 @@
 #include "ConnectedState.hpp"
 
 #include "NotConnectedState.hpp"
+#include "SendingCallState.hpp"
 #include "TalkingState.hpp"
 
 namespace ue
@@ -14,12 +15,9 @@ ConnectedState::ConnectedState(Context &context)
 
 void ConnectedState::handleTimeout()
 {
-    if (m_ringing)
-    {
-        m_ringing = false;
-        context.bts.sendCallDrop(m_callingNumber, m_myNumber);
-        context.user.showConnected();
-    }
+    m_ringing = false;
+    context.bts.sendCallDrop(m_callingNumber, m_myNumber);
+    context.user.showConnected();
 }
 
 void ConnectedState::handleDisconnect()
@@ -97,6 +95,7 @@ void ConnectedState::handleSmsResponse(bool status)
 
 void ConnectedState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
 {
+    context.logger.logInfo("Dropping CallRequest from ", (int)from.value);
     m_ringing = false;
     context.timer.stopTimer();
     context.bts.sendCallDrop(from, to);
@@ -104,14 +103,32 @@ void ConnectedState::handleCallDrop(common::PhoneNumber from, common::PhoneNumbe
 
 void ConnectedState::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
 {
+    context.logger.logInfo("Accepting CallRequest from ", (int)from.value);
     m_ringing = false;
     context.timer.stopTimer();
+    context.bts.sendCallAccept(from, to);
     context.setState<TalkingState>(from, to);
 }
 
 void ConnectedState::handleUnknownRecipient()
 {
     handleSmsResponse(!m_ringing);
+}
+
+void ConnectedState::handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
+{
+    context.logger.logInfo("Sending CallRequest to ", (int)to.value);
+    context.user.showDialling(from, to);
+    context.bts.sendCallRequest(from, to);
+    context.setState<SendingCallState>(from, to);
+}
+
+void ConnectedState::handleCallDropped()
+{
+    context.logger.logInfo("CallRequest dropped");
+    m_ringing = false;
+    context.timer.stopTimer();
+    context.user.showConnected();
 }
 
 }

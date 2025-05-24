@@ -41,6 +41,7 @@ void UserPort::showConnected()
     menu.clearSelectionList();
     menu.addSelectionListItem("Compose SMS", "");
     menu.addSelectionListItem("View SMS", "");
+    menu.addSelectionListItem("Dial", "");
 
     gui.setAcceptCallback([this, &menu]() {
         auto selected = menu.getCurrentItemIndex();
@@ -58,6 +59,9 @@ void UserPort::showConnected()
             break;
         case 1: // "View SMS"
             handler->handleViewSmsList();
+            break;
+        case 2: // "Dial"
+            showDialMode();
             break;
         default:
             logger.logError("Unknown menu selection");
@@ -191,4 +195,39 @@ void UserPort::showUnknownRecipient(common::PhoneNumber number)
     });
 }
 
+void UserPort::showDialMode()
+{
+    IUeGui::IDialMode &dialMode = gui.setDialMode();
+
+    gui.setAcceptCallback(
+        [this, &dialMode]()
+        {
+            auto to = dialMode.getPhoneNumber();
+            if (to.isValid())
+            {
+                handler->handleSendCallRequest(phoneNumber, to);
+            }
+            else
+            {
+                logger.logError("Invalid phone number for dialing");
+            }
+        });
+
+    gui.setRejectCallback([this]() { showConnected(); });
+}
+
+void UserPort::showDialling(common::PhoneNumber from, common::PhoneNumber to)
+{
+    const std::string info = "Dialling...\nto: " + std::to_string(to.value);
+    gui.setAlertMode().setText(info);
+
+    gui.setRejectCallback(
+        [this, from, to]() -> void
+        {
+            handler->handleCallDrop(from, to);
+            showConnected();
+        });
+
+    gui.setAcceptCallback([this]() {});
+}
 }

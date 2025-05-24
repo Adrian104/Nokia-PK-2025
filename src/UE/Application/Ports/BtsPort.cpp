@@ -74,6 +74,16 @@ void BtsPort::handleMessage(BinaryMessage msg)
             handler->handleCallTalk(msgId, from, to, text);
             break;
         }
+        case common::MessageId::CallAccepted:
+        {
+            handler->handleCallAccepted();
+            break;
+        }
+        case common::MessageId::CallDropped:
+        {
+            handler->handleCallDropped();
+            break;
+        }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
 
@@ -116,7 +126,7 @@ bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber
         common::OutgoingMessage msg{common::MessageId::Sms, from, to};
         msg.writeText(text);
         transport.sendMessage(msg.getMessage());
-        return true; // SMS sent successfully to BTS
+        return true;
     }
     catch (const std::exception& e)
     {
@@ -176,6 +186,23 @@ bool BtsPort::sendCallTalk(common::PhoneNumber from, common::PhoneNumber to, con
         return false;
     }
 
+}
+
+bool BtsPort::sendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
+{
+    logger.logDebug("sendCallRequest: from ", from, " to ", to);
+
+    try
+    {
+        common::OutgoingMessage msg{common::MessageId::CallRequest, from, to};
+        transport.sendMessage(msg.getMessage());
+        return true;
+    }
+    catch (const std::exception &e)
+    {
+        logger.logError("Failed to send call request: ", e.what());
+        return false;
+    }
 }
 
 }

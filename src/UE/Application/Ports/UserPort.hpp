@@ -26,6 +26,8 @@ public:
     void showTalk(common::PhoneNumber from, common::PhoneNumber to) override;
     void addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
     void showUnknownRecipient(common::PhoneNumber number) override;
+    void showDialMode() override;
+    void showDialling(common::PhoneNumber from, common::PhoneNumber to) override;
 
 private:
     common::PrefixedLogger logger;

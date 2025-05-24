@@ -107,4 +107,18 @@ void Application::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumb
     context.state->handleSendCallTalk(from, to, message);
 }
 
+void Application::handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
+{
+    context.state->handleSendCallRequest(from, to);
+}
+
+void Application::handleCallDropped()
+{
+    context.state->handleCallDropped();
+}
+
+void Application::handleCallAccepted()
+{
+    context.state->handleCallAccepted();
+}
 }
