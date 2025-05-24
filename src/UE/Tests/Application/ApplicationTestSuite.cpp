@@ -67,8 +67,8 @@ struct ApplicationConnectingTestSuite : ApplicationNotConnectedTestSuite
 
     void handleAttachAccept()
     {
-        EXPECT_CALL(timerPortMock, stopTimer());
-        EXPECT_CALL(userPortMock, showConnected());
+        EXPECT_CALL(timerPortMock, stopTimer()).Times(::testing::AnyNumber());
+        EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
         objectUnderTest.handleAttachAccept();
     }
 };
@@ -168,5 +168,95 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleSendSms)
     common::PhoneNumber to{222};
     std::string text("test");
     handleSendSms(from, to, text);
+}
+
+struct ApplicationSendingCallTestSuite : ApplicationConnectedTestSuite
+{
+    common::PhoneNumber peer{200};
+
+    ApplicationSendingCallTestSuite()
+    {
+        EXPECT_CALL(btsPortMock, sendCallAccept(_, _))
+            .Times(::testing::AnyNumber())
+            .WillRepeatedly(Return(true));
+        EXPECT_CALL(btsPortMock, sendCallDrop(_, _))
+            .Times(::testing::AnyNumber())
+            .WillRepeatedly(Return(true));
+    }
+    void sendCallRequest()
+    {
+        EXPECT_CALL(userPortMock, showDialling(PHONE_NUMBER, peer));
+        EXPECT_CALL(btsPortMock, sendCallRequest(PHONE_NUMBER, peer));
+        EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(60000)));
+        objectUnderTest.handleSendCallRequest(PHONE_NUMBER, peer);
+    }
+
+    void handleCallAccepted()
+    {
+        EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(120000)))
+            .Times(::testing::AnyNumber());
+        EXPECT_CALL(userPortMock, showTalk(peer, PHONE_NUMBER));
+        objectUnderTest.handleCallAccepted();
+    }
+
+    void handleCallDropped()
+    {
+        EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
+        objectUnderTest.handleCallDropped();
+    }
+
+    void handleUnknownRecipient()
+    {
+        EXPECT_CALL(userPortMock, showUnknownRecipient(peer));
+        EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
+        objectUnderTest.handleUnknownRecipient();
+    }
+};
+
+TEST_F(ApplicationSendingCallTestSuite, shallSendCallRequestAndShowDialling)
+{
+    sendCallRequest();
+}
+
+TEST_F(ApplicationSendingCallTestSuite, shallGoToTalkingStateOnCallAccepted)
+{
+    sendCallRequest();
+    handleCallAccepted();
+}
+
+TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnCallDropped)
+{
+    sendCallRequest();
+    handleCallDropped();
+}
+
+TEST_F(ApplicationSendingCallTestSuite, shallShowUnknownRecipientOnUnknownRecipient)
+{
+    sendCallRequest();
+    handleUnknownRecipient();
+}
+
+TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnTimeout)
+{
+    sendCallRequest();
+    EXPECT_CALL(btsPortMock, sendCallDrop(peer, PHONE_NUMBER));
+    EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
+    objectUnderTest.handleTimeout();
+}
+
+TEST_F(ApplicationSendingCallTestSuite, shallShowIncomingCallInterruptingSendingCall)
+{
+    sendCallRequest();
+    common::MessageId msgId{99};
+    common::PhoneNumber from{12};
+    common::PhoneNumber to{PHONE_NUMBER};
+    std::string enc;
+
+    EXPECT_CALL(timerPortMock, stopTimer()).Times(::testing::AnyNumber());
+    EXPECT_CALL(btsPortMock, sendCallDrop(peer, PHONE_NUMBER));
+    EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(30000)));
+    EXPECT_CALL(userPortMock, showIncomingCall(from, to));
+
+    objectUnderTest.handleCallRequest(msgId, from, to, enc);
 }
 }

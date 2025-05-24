@@ -7,7 +7,6 @@ namespace ue
 TalkingState::TalkingState(Context &context, common::PhoneNumber from, common::PhoneNumber to)
     : BaseState(context, "TalkingState"), m_from(from), m_to(to)
 {
-    context.bts.sendCallAccept(from, to);
     context.user.showTalk(from, to);
     context.timer.startTimer(std::chrono::seconds(120));
 }

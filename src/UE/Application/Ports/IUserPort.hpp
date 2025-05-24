@@ -14,6 +14,7 @@ public:
     virtual void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) = 0;
     virtual void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) = 0;
     virtual void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string& message) = 0;
+    virtual void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) = 0;
 };
 
 class IUserPort
@@ -32,6 +33,8 @@ public:
     virtual void showTalk(common::PhoneNumber from, common::PhoneNumber to) = 0;
     virtual void showUnknownRecipient(common::PhoneNumber number) = 0;
     virtual void addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) = 0;
+    virtual void showDialMode() = 0;
+    virtual void showDialling(common::PhoneNumber from, common::PhoneNumber to) = 0;
 };
 
 }

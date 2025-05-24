@@ -49,6 +49,9 @@ public:
     void handleUnknownRecipient() override;
     void handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string & message) override;
     void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string & message) override;
+    void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleCallDropped() override;
+    void handleCallAccepted() override;
 
 private:
     Context context;
