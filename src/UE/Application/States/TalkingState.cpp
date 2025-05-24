@@ -19,7 +19,14 @@ void TalkingState::handleUnknownRecipient()
 
 void TalkingState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
 {
-    context.user.showConnected();
+    context.logger.logInfo("TalkingState::handleCallDrop");
+    context.bts.sendCallDrop(from, to);
+    context.setState<ConnectedState>();
+}
+
+void TalkingState::handleCallDropped()
+{
+    context.setState<ConnectedState>();
 }
 
 void TalkingState::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
