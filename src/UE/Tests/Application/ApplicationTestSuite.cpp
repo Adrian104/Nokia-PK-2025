@@ -259,4 +259,35 @@ TEST_F(ApplicationSendingCallTestSuite, shallShowIncomingCallInterruptingSending
 
     objectUnderTest.handleCallRequest(msgId, from, to, enc);
 }
+
+struct ApplicationTalkingTestSuite : ApplicationSendingCallTestSuite
+{
+    ApplicationTalkingTestSuite()
+    {
+        sendCallRequest();
+        handleCallAccepted();
+    }
+    void handleCallDropFromBts()
+    {
+        EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
+        objectUnderTest.handleCallDropped();
+    }
+
+    void handleCallDropFromUe()
+    {
+        EXPECT_CALL(btsPortMock, sendCallDrop(PHONE_NUMBER, peer));
+        EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
+        objectUnderTest.handleCallDrop(PHONE_NUMBER, peer);
+    }
+};
+
+TEST_F(ApplicationTalkingTestSuite, shallReturnToConnectedOnCallDropFromBts)
+{
+    handleCallDropFromBts();
+}
+
+TEST_F(ApplicationTalkingTestSuite, shallReturnToConnectedOnCallDropFromUe)
+{
+    handleCallDropFromUe();
+}
 }
