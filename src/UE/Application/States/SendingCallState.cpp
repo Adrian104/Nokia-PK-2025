@@ -25,13 +25,13 @@ void SendingCallState::handleCallDropped()
 {
     context.logger.logInfo("CallRequest dropped");
     context.timer.stopTimer();
-    context.bts.sendCallDrop(m_to, m_from);
     context.setState<ConnectedState>();
 }
 
 void SendingCallState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
 {
     context.logger.logInfo("Dropping CallRequest from ", (int)from.value);
+    context.bts.sendCallDrop(m_to, m_from);
     handleCallDropped();
 }
 
