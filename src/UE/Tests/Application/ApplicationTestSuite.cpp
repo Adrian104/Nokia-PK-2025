@@ -279,6 +279,30 @@ struct ApplicationTalkingTestSuite : ApplicationSendingCallTestSuite
         EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
         objectUnderTest.handleCallDrop(PHONE_NUMBER, peer);
     }
+
+    void handleCallTalk(common::MessageId msgId,
+        common::PhoneNumber from,
+        common::PhoneNumber to,
+        const std::string& text)
+    {
+        EXPECT_CALL(userPortMock, addCallMessage(from, to, text));
+        EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(120000)));
+        objectUnderTest.handleCallTalk(msgId, from, to, text);
+    }
+    
+    void handleSendCallTalk(common::PhoneNumber from,
+        common::PhoneNumber to,
+        const std::string& text)
+    {
+        EXPECT_CALL(btsPortMock, sendCallTalk(from, to, text));
+        objectUnderTest.handleSendCallTalk(from, to, text);
+    }
+    
+    void handleUnknownRecipientCallTalk()
+    {
+        EXPECT_CALL(userPortMock, showUnknownRecipient(peer));
+        objectUnderTest.handleUnknownRecipient();
+    }
 };
 
 TEST_F(ApplicationTalkingTestSuite, shallReturnToConnectedOnCallDropFromBts)
@@ -290,4 +314,29 @@ TEST_F(ApplicationTalkingTestSuite, shallReturnToConnectedOnCallDropFromUe)
 {
     handleCallDropFromUe();
 }
+
+TEST_F(ApplicationTalkingTestSuite, shallHandleCallTalk)
+{
+    common::MessageId msgId{1};
+    common::PhoneNumber from{123};
+    common::PhoneNumber to{9};
+    std::string text{"test incoming calltalk"};
+
+    handleCallTalk(msgId, from, to, text);
+}
+
+TEST_F(ApplicationTalkingTestSuite, shallHandleSendCallTalk)
+{
+    common::PhoneNumber from{9};
+    common::PhoneNumber to{123};
+    std::string text{"test outgoing calltalk"};
+
+    handleSendCallTalk(from, to, text);
+}
+
+TEST_F(ApplicationTalkingTestSuite, shallHandleUnknownRecipientOnCallTalk)
+{
+    handleUnknownRecipientCallTalk();
+}
+
 }
