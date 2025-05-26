@@ -177,7 +177,7 @@ void UserPort::showTalk(common::PhoneNumber from, common::PhoneNumber to)
         }
     });
     gui.setRejectCallback([this, from, to]() -> void {
-        
+        handler->handleCallDrop(from, to);
     });
 }
 
