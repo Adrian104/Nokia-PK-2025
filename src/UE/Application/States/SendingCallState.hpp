@@ -10,7 +10,7 @@ class SendingCallState : public BaseState
 public:
     SendingCallState(Context &context, common::PhoneNumber from, common::PhoneNumber to);
     void handleUnknownRecipient() override;
-    void handleCallDropped() override;
+    void handleCallDropped(common::PhoneNumber from) override;
     void handleCallAccepted() override;
     void handleTimeout() override;
     void handleCallRequest(common::MessageId msgId,

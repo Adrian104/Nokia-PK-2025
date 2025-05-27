@@ -21,7 +21,7 @@ void SendingCallState::handleUnknownRecipient()
     context.setState<ConnectedState>();
 }
 
-void SendingCallState::handleCallDropped()
+void SendingCallState::handleCallDropped(common::PhoneNumber from)
 {
     context.logger.logInfo("CallRequest dropped");
     context.timer.stopTimer();
@@ -32,7 +32,8 @@ void SendingCallState::handleCallDrop(common::PhoneNumber from, common::PhoneNum
 {
     context.logger.logInfo("Dropping CallRequest from ", (int)from.value);
     context.bts.sendCallDrop(m_to, m_from);
-    handleCallDropped();
+    context.timer.stopTimer();
+    context.setState<ConnectedState>();
 }
 
 void SendingCallState::handleCallAccepted()

@@ -24,9 +24,10 @@ void TalkingState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber 
     context.setState<ConnectedState>();
 }
 
-void TalkingState::handleCallDropped()
+void TalkingState::handleCallDropped(common::PhoneNumber from)
 {
-    context.setState<ConnectedState>();
+    if (from == m_from)
+        context.setState<ConnectedState>();
 }
 
 void TalkingState::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
@@ -48,4 +49,9 @@ void TalkingState::handleTimeout()
     context.user.showConnected();
 }
 
+void TalkingState::handleCallRequest(common::MessageId msgId,
+                                     common::PhoneNumber from,
+                                     common::PhoneNumber to,
+                                     const std::string &enc)
+{}
 }

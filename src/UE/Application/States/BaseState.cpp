@@ -107,7 +107,7 @@ void BaseState::handleSendCallRequest(common::PhoneNumber from, common::PhoneNum
     logger.logError("Uexpected: handleSendCallRequest");
 }
 
-void BaseState::handleCallDropped()
+void BaseState::handleCallDropped(common::PhoneNumber from)
 {
     logger.logError("Uexpected: handleCallDropped");
 }

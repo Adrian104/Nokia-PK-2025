@@ -27,7 +27,7 @@ public:
     void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) override;
     void handleUnknownRecipient() override;
     void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
-    void handleCallDropped() override;
+    void handleCallDropped(common::PhoneNumber from) override;
 
 private:
     common::PhoneNumber m_callingNumber;

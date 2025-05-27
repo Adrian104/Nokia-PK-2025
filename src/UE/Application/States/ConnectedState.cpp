@@ -123,7 +123,7 @@ void ConnectedState::handleSendCallRequest(common::PhoneNumber from, common::Pho
     context.setState<SendingCallState>(from, to);
 }
 
-void ConnectedState::handleCallDropped()
+void ConnectedState::handleCallDropped(common::PhoneNumber from)
 {
     context.logger.logInfo("CallRequest dropped");
     m_ringing = false;

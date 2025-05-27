@@ -112,9 +112,9 @@ void Application::handleSendCallRequest(common::PhoneNumber from, common::PhoneN
     context.state->handleSendCallRequest(from, to);
 }
 
-void Application::handleCallDropped()
+void Application::handleCallDropped(common::PhoneNumber from)
 {
-    context.state->handleCallDropped();
+    context.state->handleCallDropped(from);
 }
 
 void Application::handleCallAccepted()

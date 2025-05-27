@@ -246,10 +246,10 @@ struct ApplicationSendingCallTestSuite : ApplicationConnectedTestSuite
         objectUnderTest.handleCallAccepted();
     }
 
-    void handleCallDropped()
+    void handleCallDropped(common::PhoneNumber from)
     {
         EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
-        objectUnderTest.handleCallDropped();
+        objectUnderTest.handleCallDropped(from);
     }
 
     void handleUnknownRecipient()
@@ -273,8 +273,9 @@ TEST_F(ApplicationSendingCallTestSuite, shallGoToTalkingStateOnCallAccepted)
 
 TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnCallDropped)
 {
+    common::PhoneNumber from{111};
     sendCallRequest();
-    handleCallDropped();
+    handleCallDropped(from);
 }
 
 TEST_F(ApplicationSendingCallTestSuite, shallShowUnknownRecipientOnUnknownRecipient)
@@ -316,8 +317,9 @@ struct ApplicationTalkingTestSuite : ApplicationSendingCallTestSuite
     }
     void handleCallDropFromBts()
     {
+        common::PhoneNumber from{111};
         EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
-        objectUnderTest.handleCallDropped();
+        objectUnderTest.handleCallDropped(from);
     }
 
     void handleCallDropFromUe()

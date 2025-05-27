@@ -39,7 +39,7 @@ public:
     void handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string & message) override;
     void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
     void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
-    void handleCallDropped() override;
+    void handleCallDropped(common::PhoneNumber from) override;
     void handleCallAccepted() override;
 
 protected:

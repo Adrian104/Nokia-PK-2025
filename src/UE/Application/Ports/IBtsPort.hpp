@@ -26,7 +26,7 @@ public:
     virtual void handleSmsResponse(bool status) = 0;
     virtual void handleUnknownRecipient() = 0;
     virtual void handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message) = 0;
-    virtual void handleCallDropped() = 0;
+    virtual void handleCallDropped(common::PhoneNumber from) = 0;
     virtual void handleCallAccepted() = 0;
 };
 
