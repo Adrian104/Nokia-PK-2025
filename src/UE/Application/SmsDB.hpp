@@ -30,6 +30,9 @@ struct SmsRecord
 	common::PhoneNumber m_to; // Phone number of receiver
 	std::string m_message; // Message of the SMS
 	SmsStatus m_status = SmsStatus::SUCCESS; // Status of the SMS
+	bool m_isNew = false; // If true, the message is unread.
+
+	std::string getTitle() const;
 };
 
 class SmsDB
@@ -48,6 +51,7 @@ public:
         const std::string& message);
 
 	void markLastSmsSentAsFailed();
+	bool hasUnreadMessages() const;
 
 	// SmsDB has begin() and end(), so it can be easily iterated over all the messages in the database.
 	std::vector<SmsRecord>::iterator begin();

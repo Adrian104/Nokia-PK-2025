@@ -18,6 +18,10 @@ public:
                            common::PhoneNumber to,
                            const std::string &enc) override;
     void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleIncomingSMS(common::MessageId msgId,
+                           common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string& text) override;
 
 private:
     common::PhoneNumber m_from;
