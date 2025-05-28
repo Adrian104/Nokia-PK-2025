@@ -19,6 +19,10 @@ public:
                            common::PhoneNumber from,
                            common::PhoneNumber to,
                            const std::string &enc) override;
+    void handleIncomingSMS(common::MessageId msgId,
+                            common::PhoneNumber from,
+                            common::PhoneNumber to,
+                            const std::string& text) override;
 
 private:
     common::PhoneNumber m_from;

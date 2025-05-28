@@ -81,10 +81,7 @@ void UserPort::showSmsList(SmsDB& smsdb)
     menu.clearSelectionList();
 
     for (SmsRecord& record : smsdb)
-    {
-        std::string itemText = "SMS From: " + std::to_string(record.m_from.value);
-        menu.addSelectionListItem(itemText, "");
-    }
+        menu.addSelectionListItem(record.getTitle(), "");
 
     gui.setAcceptCallback([this, &menu, &smsdb]() {
         auto selected = menu.getCurrentItemIndex();
@@ -95,6 +92,8 @@ void UserPort::showSmsList(SmsDB& smsdb)
         }
         unsigned int selectedIndex = selected.second;
         SmsRecord& selectedSms = *(smsdb.begin() + selectedIndex);
+        selectedSms.m_isNew = false;
+        gui.showNewSms(smsdb.hasUnreadMessages());
         handler->handleViewSms(selectedSms);
     });
 
@@ -108,7 +107,7 @@ void UserPort::showSms(SmsRecord& sms)
     IUeGui::IListViewMode& menu = gui.setListViewMode();
     menu.clearSelectionList();
 
-    if(sms.m_status == SmsStatus::FAILED)
+    if (sms.m_status == SmsStatus::FAILED)
     {
         menu.addSelectionListItem("Message failed\n to be delivered", "");
     }
