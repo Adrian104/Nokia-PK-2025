@@ -18,6 +18,8 @@ void UserPort::start(IUserEventsHandler &handler)
 {
     this->handler = &handler;
     gui.setTitle("Nokia " + to_string(phoneNumber));
+    gui.setCloseGuard([&handler]() { return handler.handleUEClose(); });
+
 }
 
 void UserPort::stop()

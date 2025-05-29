@@ -41,6 +41,7 @@ public:
     void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
     void handleCallDropped(common::PhoneNumber from) override;
     void handleCallAccepted() override;
+    IUeGui::AcceptClose handleUEClose() override;
 
 protected:
     Context& context;

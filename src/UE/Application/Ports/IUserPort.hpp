@@ -1,4 +1,5 @@
 #pragma once
+#include "IUeGui.hpp"
 #include "SmsDB.hpp"
 
 namespace ue
@@ -15,6 +16,7 @@ public:
     virtual void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) = 0;
     virtual void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string& message) = 0;
     virtual void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) = 0;
+    virtual IUeGui::AcceptClose handleUEClose() = 0;
 };
 
 class IUserPort

@@ -116,4 +116,12 @@ void BaseState::handleCallAccepted()
 {
     logger.logError("Uexpected: handleCallAccepted");
 }
+
+IUeGui::AcceptClose BaseState::handleUEClose()
+{
+    logger.logError("Uexpected: handleUEClose");
+    return false;
+    // By default, prevent closing the application, so it must be handled explicitly,
+    // so the cleanup will be done properly by the current state
+}
 }

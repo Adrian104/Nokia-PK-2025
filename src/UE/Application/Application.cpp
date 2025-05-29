@@ -121,4 +121,10 @@ void Application::handleCallAccepted()
 {
     context.state->handleCallAccepted();
 }
+
+IUeGui::AcceptClose Application::handleUEClose()
+{
+    logger.logInfo("Application close request");
+    return context.state->handleUEClose();
+}
 }
