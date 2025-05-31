@@ -23,7 +23,11 @@ QtPhoneNumberEdit::~QtPhoneNumberEdit()
 PhoneNumber QtPhoneNumberEdit::getPhoneNumber() const
 {
     bool ok = false;
-    decltype(PhoneNumber::value) val = text().toUInt(&ok, 10);
+    auto str = text();
+    bool localOk = false;
+    decltype(PhoneNumber::value) val = str.toUInt(&localOk, 10);
+    //Ensure no overflow happened in string->uint8_t, by casting back uint8_t->string
+    ok = localOk && str == QString::number(val);
     if (ok)
         return PhoneNumber{val};
     return PhoneNumber{};
