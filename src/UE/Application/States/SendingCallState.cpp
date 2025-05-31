@@ -1,6 +1,7 @@
 #include "SendingCallState.hpp"
 #include "ConnectedState.hpp"
 #include "TalkingState.hpp"
+#include "NotConnectedState.hpp"
 
 namespace ue
 {
@@ -73,6 +74,11 @@ void SendingCallState::handleIncomingSMS(common::MessageId msgId,
     logger.logInfo(log);
     context.smsdb.addReceivedSms(from, to, text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
     context.user.showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+}
+
+void SendingCallState::handleDisconnect()
+{
+    context.setState<NotConnectedState>();
 }
 
 }

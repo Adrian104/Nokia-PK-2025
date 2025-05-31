@@ -22,6 +22,7 @@ public:
                            common::PhoneNumber from,
                            common::PhoneNumber to,
                            const std::string& text) override;
+    void handleDisconnect() override;
 
 private:
     common::PhoneNumber m_from;
