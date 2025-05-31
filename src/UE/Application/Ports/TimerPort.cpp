@@ -46,6 +46,11 @@ void TimerPort::startTimer(Duration duration)
 
 void TimerPort::stopTimer()
 {
+    if (timerThread != nullptr && ( timerThread->get_id() == std::this_thread::get_id()))
+    {
+        logger.logInfo("Timer must have already timed out, nothing to stop");
+        return;
+    }
     logger.logDebug("Stop timer");
     {
         std::lock_guard<std::mutex> lock(timerMutex);
