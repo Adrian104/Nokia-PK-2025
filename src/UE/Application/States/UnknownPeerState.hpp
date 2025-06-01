@@ -24,8 +24,7 @@ public:
     void handleDisconnect() override;
 
 private:
-    // const ITimerPort::Duration TIMEOUT_DURATION = std::chrono::seconds(2);
-    const ITimerPort::Duration TIMEOUT_DURATION = std::chrono::seconds(200);
+    const ITimerPort::Duration TIMEOUT_DURATION = std::chrono::seconds(2);
     common::PhoneNumber peer;
     std::function<void(Context &unknownContext)> exitStateCallback;
     void exitState();

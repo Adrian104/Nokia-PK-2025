@@ -270,7 +270,7 @@ TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnCallDropped)
 TEST_F(ApplicationSendingCallTestSuite, shallShowUnknownRecipientOnUnknownRecipient)
 {
     EXPECT_CALL(btsPortMock, getMyPhoneNumber());
-    EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(200000)));
+    EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(2000)));
     sendCallRequest();
     handleUnknownRecipient();
 }
