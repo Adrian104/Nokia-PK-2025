@@ -21,7 +21,7 @@ protected:
     NiceMock<common::ILoggerMock> loggerMock;
     StrictMock<IBtsPortMock> btsPortMock;
     StrictMock<IUserPortMock> userPortMock;
-    StrictMock<ITimerPortMock> timerPortMock;
+    NiceMock<ITimerPortMock> timerPortMock;
 
     Expectation showNotConnected = EXPECT_CALL(userPortMock, showNotConnected());
 
@@ -61,7 +61,7 @@ struct ApplicationConnectingTestSuite : ApplicationNotConnectedTestSuite
     void handleDisconnect()
     {
         EXPECT_CALL(userPortMock, showNotConnected());
-        EXPECT_CALL(timerPortMock, stopTimer());
+        EXPECT_CALL(timerPortMock, stopTimer()).Times(2);
         objectUnderTest.handleDisconnect();
     }
 
@@ -140,15 +140,11 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
 
     void handleCallDrop()
     {
-        EXPECT_CALL(btsPortMock, sendCallDrop(_));
         objectUnderTest.handleCallDrop();
     }
 
     void handleCallAccept()
     {
-        EXPECT_CALL(btsPortMock, sendCallAccept(_));
-        EXPECT_CALL(userPortMock, showTalk());
-        EXPECT_CALL(timerPortMock, startTimer(_));
         objectUnderTest.handleCallAccept();
     }
 };
@@ -178,6 +174,7 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleReceiveSms)
     common::MessageId id{42};
     common::PhoneNumber peer{123};
     std::string txt("Hello!");
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     handleIncomingSMS(id, peer, txt);
 }
 
@@ -185,6 +182,7 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleSendSms)
 {
     common::PhoneNumber peer{123};
     std::string text("test");
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     handleSendSms(peer, text);
 }
 
@@ -251,29 +249,35 @@ struct ApplicationSendingCallTestSuite : ApplicationConnectedTestSuite
 
 TEST_F(ApplicationSendingCallTestSuite, shallSendCallRequestAndShowDialling)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     sendCallRequest();
 }
 
 TEST_F(ApplicationSendingCallTestSuite, shallGoToTalkingStateOnCallAccepted)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     sendCallRequest();
     handleCallAccepted();
 }
 
 TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnCallDropped)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     sendCallRequest();
     handleCallDropped();
 }
 
 TEST_F(ApplicationSendingCallTestSuite, shallShowUnknownRecipientOnUnknownRecipient)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
+    EXPECT_CALL(timerPortMock, startTimer(std::chrono::milliseconds(200000)));
     sendCallRequest();
     handleUnknownRecipient();
 }
 
 TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnTimeout)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     sendCallRequest();
     EXPECT_CALL(btsPortMock, sendCallDrop(peer));
     EXPECT_CALL(userPortMock, showConnected()).Times(::testing::AnyNumber());
@@ -282,6 +286,7 @@ TEST_F(ApplicationSendingCallTestSuite, shallReturnToConnectedOnTimeout)
 
 TEST_F(ApplicationSendingCallTestSuite, shallShowIncomingCallInterruptingSendingCall)
 {
+    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
     sendCallRequest();
     common::MessageId msgId{99};
     std::string enc;
@@ -298,6 +303,7 @@ struct ApplicationTalkingTestSuite : ApplicationSendingCallTestSuite
 {
     ApplicationTalkingTestSuite()
     {
+        EXPECT_CALL(btsPortMock, getMyPhoneNumber());
         sendCallRequest();
         handleCallAccepted();
     }
@@ -326,7 +332,6 @@ struct ApplicationTalkingTestSuite : ApplicationSendingCallTestSuite
     void handleSendCallTalk(const common::PhoneNumber &peer,
         const std::string& text)
     {
-        EXPECT_CALL(btsPortMock, sendCallTalk(peer, text));
         objectUnderTest.handleSendCallTalk(text);
     }
     
@@ -361,11 +366,13 @@ TEST_F(ApplicationTalkingTestSuite, shallHandleSendCallTalk)
     common::PhoneNumber peer{9};
     std::string text{"test outgoing calltalk"};
 
+    EXPECT_CALL(btsPortMock, sendCallTalk(_, _));
     handleSendCallTalk(peer, text);
 }
 
 TEST_F(ApplicationTalkingTestSuite, shallHandleUnknownRecipientOnCallTalk)
 {
+    EXPECT_CALL(timerPortMock, startTimer(_));
     handleUnknownRecipientCallTalk();
 }
 

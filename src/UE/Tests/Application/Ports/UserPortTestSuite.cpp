@@ -25,6 +25,7 @@ protected:
 
     UserPortTestSuite()
     {
+        EXPECT_CALL(guiMock, setCloseGuard(_));
         EXPECT_CALL(guiMock, setTitle(HasSubstr(to_string(PHONE_NUMBER))));
         objectUnderTest.start(handlerMock);
     }
@@ -40,18 +41,23 @@ TEST_F(UserPortTestSuite, shallStartStop)
 
 TEST_F(UserPortTestSuite, shallShowNotConnected)
 {
+    EXPECT_CALL(guiMock, setAcceptCallback(_));
+    EXPECT_CALL(guiMock, setRejectCallback(_));
     EXPECT_CALL(guiMock, showNotConnected());
     objectUnderTest.showNotConnected();
 }
 
 TEST_F(UserPortTestSuite, shallShowConnecting)
 {
+    EXPECT_CALL(guiMock, setAcceptCallback(_));
+    EXPECT_CALL(guiMock, setRejectCallback(_));
     EXPECT_CALL(guiMock, showConnecting());
     objectUnderTest.showConnecting();
 }
 
 TEST_F(UserPortTestSuite, shallShowMenuOnConnected)
 {
+    EXPECT_CALL(guiMock, setRejectCallback(_));
     EXPECT_CALL(guiMock, setListViewMode()).WillOnce(ReturnRef(listViewModeMock));
     EXPECT_CALL(listViewModeMock, clearSelectionList());
     EXPECT_CALL(listViewModeMock, addSelectionListItem(_, _)).Times(AtLeast(1));
