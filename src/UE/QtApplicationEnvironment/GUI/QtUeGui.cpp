@@ -44,7 +44,34 @@ void QtUeGui::initGUI()
 
     // move to the center
     mainWindow.setCentralWidget(&centralWidget);
-    mainWindow.move(QApplication::desktop()->screen()->rect().center() - mainWindow.rect().center());
+
+    const char *xPosEnv = std::getenv("UE_WINDOW_X");
+    const char *yPosEnv = std::getenv("UE_WINDOW_Y");
+
+    auto parseNonNegativeInt = [](const char *str, int &out) -> bool
+    {
+        if (str == nullptr || *str == '\0')
+        {
+            return false;
+        }
+
+        const std::string_view VIEW{str};
+        auto [ptr, ec] = std::from_chars(VIEW.data(), VIEW.data() + VIEW.size(), out);
+
+        return (ec == std::errc() && out >= 0);
+    };
+
+    int x = 0;
+    int y = 0;
+    if (parseNonNegativeInt(xPosEnv, x) && parseNonNegativeInt(yPosEnv, y))
+    {
+        mainWindow.move(x, y);
+    }
+    else
+    {
+        mainWindow.move(QApplication::desktop()->screen()->rect().center() -
+                        mainWindow.rect().center());
+    }
 
     // set background to centralWidget
     centralWidget.setObjectName("centralWidget");

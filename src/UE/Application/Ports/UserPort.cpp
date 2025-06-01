@@ -1,23 +1,22 @@
 #include "UserPort.hpp"
-#include "UeGui/IListViewMode.hpp"
-#include "UeGui/ISmsComposeMode.hpp"
 #include "UeGui/ICallMode.hpp"
 #include "UeGui/IDialMode.hpp"
+#include "UeGui/IListViewMode.hpp"
+#include "UeGui/ISmsComposeMode.hpp"
 #include "UeGui/ITextMode.hpp"
 
 namespace ue
 {
 
 UserPort::UserPort(common::ILogger &logger, IUeGui &gui, common::PhoneNumber phoneNumber)
-    : logger(logger, "[USER-PORT]"),
-      gui(gui),
-      phoneNumber(phoneNumber)
+    : logger(logger, "[USER-PORT]"), gui(gui), phoneNumber(phoneNumber)
 {}
 
 void UserPort::start(IUserEventsHandler &handler)
 {
     this->handler = &handler;
     gui.setTitle("Nokia " + to_string(phoneNumber));
+    gui.setCloseGuard([&handler]() { return handler.handleUEClose(); });
 }
 
 void UserPort::stop()
@@ -27,47 +26,53 @@ void UserPort::stop()
 
 void UserPort::showNotConnected()
 {
+    gui.setAcceptCallback(nullptr);
+    gui.setRejectCallback(nullptr);
     gui.showNotConnected();
+
 }
 
 void UserPort::showConnecting()
 {
+    gui.setAcceptCallback(nullptr);
+    gui.setRejectCallback(nullptr);
     gui.showConnecting();
 }
 
 void UserPort::showConnected()
 {
-    IUeGui::IListViewMode& menu = gui.setListViewMode();
+    IUeGui::IListViewMode &menu = gui.setListViewMode();
     menu.clearSelectionList();
     menu.addSelectionListItem("Compose SMS", "");
     menu.addSelectionListItem("View SMS", "");
     menu.addSelectionListItem("Dial", "");
+    gui.setAcceptCallback(
+        [this, &menu]()
+        {
+            auto selected = menu.getCurrentItemIndex();
+            if (!selected.first)
+            {
+                logger.logError("No menu item selected");
+                return;
+            }
 
-    gui.setAcceptCallback([this, &menu]() {
-        auto selected = menu.getCurrentItemIndex();
-        if (!selected.first)
-        {
-            logger.logError("No menu item selected");
-            return;
-        }
-        unsigned int selectedIndex = selected.second;
-        
-        switch (selectedIndex)
-        {
-        case 0: // "Compose SMS"
-            showSmsComposeMode();
-            break;
-        case 1: // "View SMS"
-            handler->handleViewSmsList();
-            break;
-        case 2: // "Dial"
-            showDialMode();
-            break;
-        default:
-            logger.logError("Unknown menu selection");
-            break;
-        }
-    });
+            switch (static_cast<unsigned int>(selected.second))
+            {
+            case 0: // "Compose SMS"
+                showSmsComposeMode();
+                break;
+            case 1: // "View SMS"
+                handler->handleViewSmsList();
+                break;
+            case 2: // "Dial"
+                showDialMode();
+                break;
+            default:
+                logger.logError("Unknown menu selection");
+                break;
+            }
+        });
+    gui.setRejectCallback(nullptr);
 }
 
 void UserPort::showNewMessageIndicator()
@@ -75,36 +80,38 @@ void UserPort::showNewMessageIndicator()
     gui.showNewSms(true);
 }
 
-void UserPort::showSmsList(SmsDB& smsdb)
+void UserPort::showSmsList(SmsDB &smsdb)
 {
-    IUeGui::IListViewMode& menu = gui.setListViewMode();
+    IUeGui::IListViewMode &menu = gui.setListViewMode();
     menu.clearSelectionList();
 
-    for (SmsRecord& record : smsdb)
+    for (SmsRecord &record : smsdb)
+    {
         menu.addSelectionListItem(record.getTitle(), "");
+    }
 
-    gui.setAcceptCallback([this, &menu, &smsdb]() {
-        auto selected = menu.getCurrentItemIndex();
-        if (!selected.first)
+    gui.setAcceptCallback(
+        [this, &menu, &smsdb]()
         {
-            logger.logError("No SMS selected");
-            return;
-        }
-        unsigned int selectedIndex = selected.second;
-        SmsRecord& selectedSms = *(smsdb.begin() + selectedIndex);
-        selectedSms.m_isNew = false;
-        gui.showNewSms(smsdb.hasUnreadMessages());
-        handler->handleViewSms(selectedSms);
-    });
+            auto selected = menu.getCurrentItemIndex();
+            if (!selected.first)
+            {
+                logger.logError("No SMS selected");
+                return;
+            }
+            unsigned int selectedIndex = selected.second;
+            SmsRecord &selectedSms = *(smsdb.begin() + selectedIndex);
+            selectedSms.m_isNew = false;
+            gui.showNewSms(smsdb.hasUnreadMessages());
+            handler->handleViewSms(selectedSms);
+        });
 
-    gui.setRejectCallback([this]() {
-        showConnected();
-    });
+    gui.setRejectCallback([this]() { showConnected(); });
 }
 
-void UserPort::showSms(SmsRecord& sms)
+void UserPort::showSms(SmsRecord &sms)
 {
-    IUeGui::IListViewMode& menu = gui.setListViewMode();
+    IUeGui::IListViewMode &menu = gui.setListViewMode();
     menu.clearSelectionList();
 
     if (sms.m_status == SmsStatus::FAILED)
@@ -117,81 +124,74 @@ void UserPort::showSms(SmsRecord& sms)
 
     gui.setAcceptCallback(nullptr);
 
-    gui.setRejectCallback([this]() {
-        handler->handleViewSmsList();
-    });
+    gui.setRejectCallback([this]() { handler->handleViewSmsList(); });
 }
 
 void UserPort::showSmsComposeMode()
 {
-    IUeGui::ISmsComposeMode& composeMode = gui.setSmsComposeMode();
+    IUeGui::ISmsComposeMode &composeMode = gui.setSmsComposeMode();
     composeMode.clearSmsText();
 
-    gui.setAcceptCallback([this, &composeMode]() {
-        auto to = composeMode.getPhoneNumber();
-        auto text = composeMode.getSmsText();
-
-        if (to.isValid() && !text.empty())
+    gui.setAcceptCallback(
+        [this, &composeMode]()
         {
-            handler->handleSendSms(phoneNumber, to, text);
-        }
-        else
-        {
-            logger.logError("Invalid recipient or empty message");
-        }
-    });
+            auto peer = composeMode.getPhoneNumber();
+            auto text = composeMode.getSmsText();
 
-    gui.setRejectCallback([this]() {
-        showConnected();
-    });
+            if (peer.isValid() && !text.empty())
+            {
+                handler->handleSendSms(peer, text);
+            }
+            else
+            {
+                logger.logError("Invalid recipient or empty message");
+            }
+        });
+
+    gui.setRejectCallback([this]() { showConnected(); });
 }
 
-void UserPort::showIncomingCall(common::PhoneNumber from, common::PhoneNumber to)
+void UserPort::showIncomingCall(const common::PhoneNumber &peer)
 {
-    const std::string info = "Incoming call\nfrom: " + std::to_string(from.value);
-    gui.setAlertMode().setText(info);
+    const std::string INFO = "Incoming call\nfrom: " + std::to_string(peer.value);
+    gui.setAlertMode().setText(INFO);
 
-    gui.setAcceptCallback([this, from, to]() -> void {
-        handler->handleCallAccept(from, to);
-    });
+    gui.setAcceptCallback([this]() -> void { handler->handleCallAccept(); });
 
-    gui.setRejectCallback([this, from, to]() -> void {
-        handler->handleCallDrop(from, to);
-        showConnected();
-    });
+    gui.setRejectCallback([this]() -> void { handler->handleCallDrop(); });
 }
 
-void UserPort::showTalk(common::PhoneNumber from, common::PhoneNumber to)
+void UserPort::showTalk()
 {
-    IUeGui::ICallMode& callMode = gui.setCallMode();
+    IUeGui::ICallMode &callMode = gui.setCallMode();
     callMode.clearIncomingText();
 
-    gui.setAcceptCallback([this, &callMode, to, from]() {
-        std::string outgoingMessage = callMode.getOutgoingText();
-        if (!outgoingMessage.empty())
+    gui.setAcceptCallback(
+        [this, &callMode]()
         {
-            callMode.appendIncomingText(std::to_string(to.value) + ": " + outgoingMessage);
-            handler->handleSendCallTalk(phoneNumber, from, outgoingMessage);
-            callMode.clearOutgoingText();
-        }
-    });
-    gui.setRejectCallback([this, from, to]() -> void {
-        handler->handleCallDrop(from, to);
-    });
+            std::string outgoingMessage = callMode.getOutgoingText();
+            if (!outgoingMessage.empty())
+            {
+                callMode.appendIncomingText(std::to_string(phoneNumber.value) + ": " +
+                                            outgoingMessage);
+                handler->handleSendCallTalk(outgoingMessage);
+                callMode.clearOutgoingText();
+            }
+        });
+    gui.setRejectCallback([this]() -> void { handler->handleCallDrop(); });
 }
 
-void UserPort::addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+void UserPort::addCallMessage(const common::PhoneNumber &sender, const std::string &message)
 {
-    IUeGui::ICallMode& callMode = gui.setCallMode();
-    callMode.appendIncomingText(std::to_string(from.value) + ": " + message);
+    IUeGui::ICallMode &callMode = gui.setCallMode();
+    callMode.appendIncomingText(std::to_string(sender.value) + ": " + message);
 }
 
-void UserPort::showUnknownRecipient(common::PhoneNumber number)
+void UserPort::showUnknownRecipient(const common::PhoneNumber &peer)
 {
-    gui.showPeerUserNotAvailable(number);
-    gui.setRejectCallback([this]() -> void {
-        showConnected();
-    });
+    gui.showPeerUserNotAvailable(peer);
+    gui.setAcceptCallback(nullptr);
+    gui.setRejectCallback([this]() -> void { handler->handleCallDrop(); });
 }
 
 void UserPort::showDialMode()
@@ -201,10 +201,10 @@ void UserPort::showDialMode()
     gui.setAcceptCallback(
         [this, &dialMode]()
         {
-            auto to = dialMode.getPhoneNumber();
-            if (to.isValid())
+            const auto TO = dialMode.getPhoneNumber();
+            if (TO.isValid())
             {
-                handler->handleSendCallRequest(phoneNumber, to);
+                handler->handleSendCallRequest(TO);
             }
             else
             {
@@ -215,17 +215,12 @@ void UserPort::showDialMode()
     gui.setRejectCallback([this]() { showConnected(); });
 }
 
-void UserPort::showDialling(common::PhoneNumber from, common::PhoneNumber to)
+void UserPort::showDialling(const common::PhoneNumber &peer)
 {
-    const std::string info = "Dialling...\nto: " + std::to_string(to.value);
-    gui.setAlertMode().setText(info);
+    const std::string INFO = "Dialling...\nto: " + std::to_string(peer.value);
+    gui.setAlertMode().setText(INFO);
 
-    gui.setRejectCallback(
-        [this, from, to]() -> void
-        {
-            handler->handleCallDrop(from, to);
-            showConnected();
-        });
+    gui.setRejectCallback([this]() -> void { handler->handleCallDrop(); });
 
     gui.setAcceptCallback([this]() {});
 }

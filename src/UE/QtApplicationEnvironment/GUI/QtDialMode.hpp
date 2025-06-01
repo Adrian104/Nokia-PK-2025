@@ -21,7 +21,7 @@ public:
     void init();
     void activate();
 
-    PhoneNumber getPhoneNumber() const override;
+    common::PhoneNumber getPhoneNumber() const override;
 
 private:
     QtCallMode& baseMode;

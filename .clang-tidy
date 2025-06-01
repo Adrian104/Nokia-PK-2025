@@ -7,7 +7,8 @@ Checks: >
   -cppcoreguidelines-special-member-functions,
   -cppcoreguidelines-explicit-virtual-functions,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
-  -modernize-use-override
+  -modernize-use-override,
+  -modernize-use-trailing-return-type
 
 WarningsAsErrors: ''
 
@@ -26,3 +27,7 @@ CheckOptions:
     value: camelBack
   - key: readability-identifier-naming.ConstantCase
     value: UPPER_CASE
+  - key: readability-identifier-length.MinimumParameterNameLength
+    value: 0
+  - key: readability-identifier-length.MinimumVariableNameLength
+    value: 0

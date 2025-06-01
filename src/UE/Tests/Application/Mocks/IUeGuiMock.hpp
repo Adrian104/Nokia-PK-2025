@@ -60,7 +60,7 @@ public:
     ISmsComposeModeMock();
     ~ISmsComposeModeMock() override;
 
-    MOCK_METHOD(PhoneNumber, getPhoneNumber, (), (const, final));
+    MOCK_METHOD(common::PhoneNumber, getPhoneNumber, (), (const, final));
     MOCK_METHOD(std::string, getSmsText, (), (const, final));
     MOCK_METHOD(void, clearSmsText, (), (final));
 };
@@ -83,7 +83,7 @@ public:
     IDialModeMock();
     ~IDialModeMock() override;
 
-    MOCK_METHOD(PhoneNumber, getPhoneNumber, (), (const, final));
+    MOCK_METHOD(common::PhoneNumber, getPhoneNumber, (), (const, final));
 };
 
 }

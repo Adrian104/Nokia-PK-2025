@@ -1,31 +1,31 @@
 #pragma once
 
 #include "BaseState.hpp"
-
 namespace ue
 {
 
-class SendingCallState : public BaseState
+class ReceivingCallState : public BaseState
 {
 public:
-    SendingCallState(Context &context, const common::PhoneNumber& peer);
-
-    void handleUnknownRecipient() override;
-    void handleCallDropped() override;
-    void handleCallAccepted() override;
+    ReceivingCallState(Context &context, const common::PhoneNumber& peer);
     void handleTimeout() override;
     void handleCallRequest(common::MessageId msgId,
                            const common::PhoneNumber& peer,
                            const std::string &enc) override;
     void handleCallDrop() override;
+    void handleCallAccept() override;
+    void handleCallDropped() override;
+    IUeGui::AcceptClose handleUEClose() override;
     void handleIncomingSMS(common::MessageId msgId,
                            const common::PhoneNumber &peer,
                            const std::string &text) override;
-    IUeGui::AcceptClose handleUEClose() override;
     void handleDisconnect() override;
 
 private:
-    const common::PhoneNumber peer;
+    const ITimerPort::Duration timeoutDuration = std::chrono::seconds(30);
+    common::PhoneNumber peer;
+
+    void dropAndGoToMainMenu(const bool send_drop_msg = true) const;
 };
 
 }

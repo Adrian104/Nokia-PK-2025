@@ -96,7 +96,7 @@ TEST_F(BtsPortTestSuite, shallSendAttachRequest)
 
 TEST_F(BtsPortTestSuite, shallSendSms)
 {
-    const common::PhoneNumber from{};
+    const common::PhoneNumber from{112};
     const common::PhoneNumber to{PHONE_NUMBER};
     const std::string text{"Test message"};
 
@@ -109,7 +109,7 @@ TEST_F(BtsPortTestSuite, shallSendSms)
                 return true;
             });
 
-    bool result = objectUnderTest.sendSms(from, to, text);
+    bool result = objectUnderTest.sendSms(to, text);
     ASSERT_TRUE(result);
 
     common::IncomingMessage reader(capturedMsg);

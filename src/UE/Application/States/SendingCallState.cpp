@@ -1,78 +1,101 @@
 #include "SendingCallState.hpp"
 #include "ConnectedState.hpp"
+#include "NotConnectedState.hpp"
+#include "ReceivingCallState.hpp"
 #include "TalkingState.hpp"
+#include "UnknownPeerState.hpp"
 
 namespace ue
 {
 
-SendingCallState::SendingCallState(Context &context,
-                                   common::PhoneNumber from,
-                                   common::PhoneNumber to)
-    : BaseState(context, "SendingCallState"), m_from(from), m_to(to)
+SendingCallState::SendingCallState(Context &context, const common::PhoneNumber &peer)
+    : BaseState(context, "SendingCallState"), peer(peer)
 {
+    context.logger.logInfo("Sending CallRequest to ", static_cast<int>(peer.value));
+    context.user.showDialling(peer);
+    context.bts.sendCallRequest(peer);
     context.timer.startTimer(std::chrono::seconds(60));
 }
 
 void SendingCallState::handleUnknownRecipient()
 {
     context.logger.logInfo("Unknown Recipient");
-    context.timer.stopTimer();
-    context.user.showUnknownRecipient(m_to);
-    context.setState<ConnectedState>();
+    context.setState<UnknownPeerState>(peer,
+                                       [](Context &unknownContext)
+                                       {
+                                           unknownContext.setState<ConnectedState>();
+                                           // since dialing screen isn't a specific state we
+                                           // have to call this method after changing state to
+                                           // ConnectedState (which by default opens main menu)
+                                           // If we did it before changing state, then it would
+                                           // not work, because the ConnectedState state's
+                                           // constructor would "override" this by opening main
+                                           // menu screen
+                                           unknownContext.user.showDialMode();
+                                       });
 }
 
-void SendingCallState::handleCallDropped(common::PhoneNumber from)
+void SendingCallState::handleCallDropped()
 {
+    context.timer.stopTimer();
     context.logger.logInfo("CallRequest dropped");
-    context.timer.stopTimer();
     context.setState<ConnectedState>();
 }
 
-void SendingCallState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+void SendingCallState::handleCallDrop()
 {
-    context.logger.logInfo("Dropping CallRequest from ", (int)from.value);
-    context.bts.sendCallDrop(m_to, m_from);
     context.timer.stopTimer();
+    context.logger.logInfo("Dropping CallRequest to ", static_cast<int>(peer.value));
+    context.bts.sendCallDrop(peer);
     context.setState<ConnectedState>();
 }
 
 void SendingCallState::handleCallAccepted()
 {
-    context.logger.logInfo("CallRequest accepted by ", (int)m_to.value);
     context.timer.stopTimer();
-    context.setState<TalkingState>(m_to, m_from);
+    context.logger.logInfo("CallRequest accepted by ", static_cast<int>(peer.value));
+    context.setState<TalkingState>(peer);
 }
 
 void SendingCallState::handleTimeout()
 {
     context.logger.logInfo("CallRequest timed out");
-    context.bts.sendCallDrop(m_to, m_from);
+    context.bts.sendCallDrop(peer);
     context.setState<ConnectedState>();
 }
 
 void SendingCallState::handleCallRequest(common::MessageId msgId,
-                                         common::PhoneNumber from,
-                                         common::PhoneNumber to,
+                                         const common::PhoneNumber &peer,
                                          const std::string &enc)
 {
     context.timer.stopTimer();
-    context.bts.sendCallDrop(m_to, m_from);
-    context.timer.startTimer(std::chrono::seconds(30));
-    context.setState<ConnectedState>();
-    context.user.showIncomingCall(from, to);
+    context.bts.sendCallDrop(this->peer);
+    context.setState<ReceivingCallState>(peer);
 }
 
 void SendingCallState::handleIncomingSMS(common::MessageId msgId,
-                                       common::PhoneNumber from,
-                                       common::PhoneNumber to,
-                                       const std::string& text)
+                                         const common::PhoneNumber &peer,
+                                         const std::string &text)
 {
-    std::string log = std::string("Received message from ")
-    + std::to_string(from.value) + std::string(", content: ") + text;
+    logger.logInfo("Received message from ", peer.value, ", content: ", text);
+    const auto number_of_this_UE = context.bts.getMyPhoneNumber();
+    context.smsdb.addReceivedSms(
+        peer,
+        number_of_this_UE,
+        text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
+    context.user
+        .showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+}
+IUeGui::AcceptClose SendingCallState::handleUEClose()
+{
+    context.timer.stopTimer();
+    context.bts.sendCallDrop(peer);
+    return true;
+}
 
-    logger.logInfo(log);
-    context.smsdb.addReceivedSms(from, to, text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
-    context.user.showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+void SendingCallState::handleDisconnect()
+{
+    context.setState<NotConnectedState>();
 }
 
 }
