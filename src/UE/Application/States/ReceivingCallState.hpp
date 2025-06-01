@@ -8,13 +8,13 @@ class ReceivingCallState : public BaseState
 {
 public:
     ReceivingCallState(Context &context, const common::PhoneNumber& peer);
-    void handleTimeout() final;
+    void handleTimeout() override;
     void handleCallRequest(common::MessageId msgId,
                            const common::PhoneNumber& peer,
-                           const std::string &enc) final;
-    void handleCallDrop() final;
-    void handleCallAccept() final;
-    void handleCallDropped() final;
+                           const std::string &enc) override;
+    void handleCallDrop() override;
+    void handleCallAccept() override;
+    void handleCallDropped() override;
     IUeGui::AcceptClose handleUEClose() override;
     void handleIncomingSMS(common::MessageId msgId,
                            const common::PhoneNumber &peer,
