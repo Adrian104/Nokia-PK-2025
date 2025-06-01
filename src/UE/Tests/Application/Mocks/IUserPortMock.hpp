@@ -5,22 +5,20 @@
 
 namespace ue
 {
-
 class IUserEventsHandlerMock : public IUserEventsHandler
 {
 public:
     IUserEventsHandlerMock();
     ~IUserEventsHandlerMock() override;
-    MOCK_METHOD(void, handleViewSmsList, (), (final)); 
+
+    MOCK_METHOD(void, handleViewSmsList, (), (final));
     MOCK_METHOD(void, handleViewSms, (SmsRecord&), (final));
-    MOCK_METHOD(void, handleSendSms, (const common::PhoneNumber&, const common::PhoneNumber&, const std::string&), (final));
-    MOCK_METHOD(void, handleCallDrop, (common::PhoneNumber, common::PhoneNumber), (final));
-    MOCK_METHOD(void, handleCallAccept, (common::PhoneNumber, common::PhoneNumber), (final));
-    MOCK_METHOD(void, handleSendCallTalk, (common::PhoneNumber, common::PhoneNumber, const std::string&), (final));
-    MOCK_METHOD(void,
-                handleSendCallRequest,
-                (common::PhoneNumber, common::PhoneNumber),
-                (final));
+    MOCK_METHOD(void, handleSendSms, (const common::PhoneNumber&, const std::string&), (final));
+    MOCK_METHOD(void, handleCallDrop, (), (final));
+    MOCK_METHOD(void, handleCallAccept, (), (final));
+    MOCK_METHOD(void, handleSendCallTalk, (const std::string&), (final));
+    MOCK_METHOD(void, handleSendCallRequest, (const common::PhoneNumber&), (final));
+    MOCK_METHOD(IUeGui::AcceptClose, handleUEClose, (), (final));
 };
 
 class IUserPortMock : public IUserPort
@@ -36,12 +34,13 @@ public:
     MOCK_METHOD(void, showSmsList, (SmsDB&), (final));
     MOCK_METHOD(void, showSms, (SmsRecord&), (final));
     MOCK_METHOD(void, showSmsComposeMode, (), (final));
-    MOCK_METHOD(void, showIncomingCall, (common::PhoneNumber, common::PhoneNumber), (final));
-    MOCK_METHOD(void, showTalk, (common::PhoneNumber, common::PhoneNumber), (final));
-    MOCK_METHOD(void, showUnknownRecipient, (common::PhoneNumber), (final));
-    MOCK_METHOD(void, addCallMessage, (common::PhoneNumber, common::PhoneNumber, const std::string&), (final));
+
+    MOCK_METHOD(void, showIncomingCall, (const common::PhoneNumber&), (final));
+    MOCK_METHOD(void, showTalk, (), (final));
+    MOCK_METHOD(void, showUnknownRecipient, (const common::PhoneNumber&), (final));
+    MOCK_METHOD(void, addCallMessage, (const common::PhoneNumber&, const std::string&), (final));
     MOCK_METHOD(void, showDialMode, (), (final));
-    MOCK_METHOD(void, showDialling, (common::PhoneNumber, common::PhoneNumber), (final));
+    MOCK_METHOD(void, showDialling, (const common::PhoneNumber&), (final));
 };
 
 }

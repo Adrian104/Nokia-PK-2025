@@ -109,7 +109,7 @@ TEST_F(BtsPortTestSuite, shallSendSms)
                 return true;
             });
 
-    bool result = objectUnderTest.sendSms(from, to, text);
+    bool result = objectUnderTest.sendSms(to, text);
     ASSERT_TRUE(result);
 
     common::IncomingMessage reader(capturedMsg);
