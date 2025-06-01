@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Context.hpp"
 #include "IEventsHandler.hpp"
 #include "Logger/PrefixedLogger.hpp"
-#include "Context.hpp"
 
 namespace ue
 {
@@ -10,7 +10,7 @@ namespace ue
 class BaseState : public IEventsHandler
 {
 public:
-    BaseState(Context& context, const std::string& name);
+    BaseState(Context &context, const std::string &name);
     ~BaseState() override;
 
     // ITimerEventsHandler interface
@@ -20,31 +20,29 @@ public:
     void handleSib(common::BtsId btsId) override;
     void handleAttachAccept() override;
     void handleAttachReject() override;
-    void handleDisconnect() override;
+    void handleDisconnect() override = 0;
     void handleIncomingSMS(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
-                           const std::string& text) override;
+                           const common::PhoneNumber &peer,
+                           const std::string &text) override = 0;
     void handleCallRequest(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
-                           const std::string& enc) override;
+                           const common::PhoneNumber &peer,
+                           const std::string &enc) override = 0;
     void handleViewSmsList() override;
-    void handleViewSms(SmsRecord& sms) override;
-    void handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text) override;
+    void handleViewSms(SmsRecord &sms) override;
+    void handleSendSms(const common::PhoneNumber &peer, const std::string &text) override;
     void handleSmsResponse(bool status) override;
-    void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
-    void handleCallAccept(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleCallDrop() override;
+    void handleCallAccept() override;
     void handleUnknownRecipient() override;
-    void handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string & message) override;
-    void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
-    void handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
-    void handleCallDropped(common::PhoneNumber from) override;
+    void handleCallTalk(const common::PhoneNumber& sender, const std::string &message) override;
+    void handleSendCallTalk(const std::string &message) override;
+    void handleSendCallRequest(const common::PhoneNumber &peer) override;
+    void handleCallDropped() override;
     void handleCallAccepted() override;
-    IUeGui::AcceptClose handleUEClose() override;
+    IUeGui::AcceptClose handleUEClose() override = 0;
 
 protected:
-    Context& context;
+    Context &context;
     common::PrefixedLogger logger;
 };
 

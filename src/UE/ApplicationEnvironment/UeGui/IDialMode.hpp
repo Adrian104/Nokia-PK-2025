@@ -10,7 +10,7 @@ class IUeGui::IDialMode
 {
 public:
     virtual ~IDialMode() = default;
-    virtual PhoneNumber getPhoneNumber() const = 0;
+    virtual common::PhoneNumber getPhoneNumber() const = 0;
 };
 
 }

@@ -29,6 +29,7 @@ struct Context
                        state ? typeid(*state).name() : "null",
                        " to: ",
                        typeid(State).name());
+        timer.stopTimer();
         state = std::make_unique<State>(*this, std::forward<Arg>(arg)...);
     }
 };

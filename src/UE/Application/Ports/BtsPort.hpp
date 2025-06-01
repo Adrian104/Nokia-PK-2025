@@ -2,7 +2,7 @@
 
 #include "IBtsPort.hpp"
 #include "Logger/PrefixedLogger.hpp"
-#include "ITransport.hpp"
+#include "CommonEnvironment/ITransport.hpp"
 #include "Messages/PhoneNumber.hpp"
 
 namespace ue
@@ -16,14 +16,17 @@ public:
     void stop();
 
     void sendAttachRequest(common::BtsId) override;
-    bool sendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text) override;
-    bool sendCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
-    bool sendCallAccept(common::PhoneNumber from, common::PhoneNumber to) override;
-    bool sendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
-    bool sendCallRequest(common::PhoneNumber from, common::PhoneNumber to) override;
+    bool sendSms(const common::PhoneNumber& peer, const std::string& text) override;
+    bool sendCallDrop(const common::PhoneNumber& peer) override;
+    bool sendCallAccept(const common::PhoneNumber& peer) override;
+    bool sendCallTalk(const common::PhoneNumber& peer, const std::string &message) override;
+    bool sendCallRequest(const common::PhoneNumber& peer) override;
+
+    common::PhoneNumber getMyPhoneNumber() const override;
+
 
 private:
-    void handleMessage(BinaryMessage msg);
+    void handleMessage(common::BinaryMessage msg);
     void handleDisconnect();
 
     common::PrefixedLogger logger;

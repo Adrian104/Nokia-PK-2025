@@ -14,7 +14,10 @@ public:
     UserPort(common::ILogger& logger, IUeGui& gui, common::PhoneNumber phoneNumber);
     void start(IUserEventsHandler& handler);
     void stop();
-
+    // To ensure no old (bad) callback is called every screen must
+    // set both accept and reject callbacks, even if they are empty,
+    // otherwise the previous screen's callback will be called which can lead to
+    // unexpected behavior.
     void showNotConnected() override;
     void showConnecting() override;
     void showConnected() override;
@@ -22,12 +25,12 @@ public:
     void showSmsList(SmsDB& smsdb) override; // Shows the SMS list view screen
     void showSms(SmsRecord& sms) override; // Shows the SMS view screen
     void showSmsComposeMode() override; // Shows the SMS compose mode screen
-    void showIncomingCall(common::PhoneNumber from, common::PhoneNumber to) override;
-    void showTalk(common::PhoneNumber from, common::PhoneNumber to) override;
-    void addCallMessage(common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
-    void showUnknownRecipient(common::PhoneNumber number) override;
+    void showIncomingCall(const common::PhoneNumber& peer) override;
+    void showTalk() override;
+    void addCallMessage(const common::PhoneNumber& sender, const std::string &message) override;
+    void showUnknownRecipient(const common::PhoneNumber& peer) override;
     void showDialMode() override;
-    void showDialling(common::PhoneNumber from, common::PhoneNumber to) override;
+    void showDialling(const common::PhoneNumber& peer) override;
 
 private:
     common::PrefixedLogger logger;

@@ -1,70 +1,95 @@
 #include "TalkingState.hpp"
 #include "ConnectedState.hpp"
+#include "NotConnectedState.hpp"
+#include "UnknownPeerState.hpp"
 
 namespace ue
 {
 
-TalkingState::TalkingState(Context &context, common::PhoneNumber from, common::PhoneNumber to)
-    : BaseState(context, "TalkingState"), m_from(from), m_to(to)
+TalkingState::TalkingState(Context &context, const common::PhoneNumber &peer)
+    : BaseState(context, "TalkingState"), peer(peer)
 {
-    context.user.showTalk(from, to);
-    context.timer.startTimer(std::chrono::seconds(120));
+    context.logger.logInfo("Accepting call from ", static_cast<int>(this->peer.value));
+    context.bts.sendCallAccept(peer);
+    context.user.showTalk();
+    context.timer.startTimer(TALKING_TIMEOUT);
 }
 
 void TalkingState::handleUnknownRecipient()
 {
-    context.setState<ConnectedState>();
-    context.user.showUnknownRecipient(m_from);
+    context.setState<UnknownPeerState>(peer);
 }
 
-void TalkingState::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+void TalkingState::handleCallDrop()
 {
+    context.timer.stopTimer();
     context.logger.logInfo("TalkingState::handleCallDrop");
-    context.bts.sendCallDrop(from, to);
+    context.bts.sendCallDrop(peer);
     context.setState<ConnectedState>();
 }
 
-void TalkingState::handleCallDropped(common::PhoneNumber from)
+void TalkingState::handleCallDropped()
 {
-    if (from == m_from)
-        context.setState<ConnectedState>();
+    context.setState<ConnectedState>();
 }
 
-void TalkingState::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+void TalkingState::handleCallTalk(const common::PhoneNumber &sender,
+                                  const std::string &message)
 {
-    context.user.addCallMessage(from, to, message);
-    context.timer.startTimer(std::chrono::seconds(120));
+    context.timer.stopTimer();
+    context.user.addCallMessage(sender, message);
+    context.timer.startTimer(TALKING_TIMEOUT);
 }
 
-void TalkingState::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+void TalkingState::handleSendCallTalk(const std::string &message)
 {
-    context.bts.sendCallTalk(from, to, message);
-    context.timer.startTimer(std::chrono::seconds(120));
+    context.timer.stopTimer();
+    context.bts.sendCallTalk(peer, message);
+    context.timer.startTimer(TALKING_TIMEOUT);
 }
 
 void TalkingState::handleTimeout()
 {
-    context.bts.sendCallDrop(m_from, m_to);
+    context.bts.sendCallDrop(peer);
     context.setState<ConnectedState>();
-    context.user.showConnected();
 }
 
 void TalkingState::handleCallRequest(common::MessageId msgId,
-                                     common::PhoneNumber from,
-                                     common::PhoneNumber to,
+                                     const common::PhoneNumber &peer,
                                      const std::string &enc)
-{}
+{
+    if (peer != this->peer)
+    {
+        logger.logInfo("Dropping new call request from ",
+                       static_cast<int>(peer.value),
+                       "when already talking with ",
+                       static_cast<int>(this->peer.value));
+        context.bts.sendCallDrop(peer);
+    }
+}
 
 void TalkingState::handleIncomingSMS(common::MessageId msgId,
-                                       common::PhoneNumber from,
-                                       common::PhoneNumber to,
-                                       const std::string& text)
+                                     const common::PhoneNumber &peer,
+                                     const std::string &text)
 {
-    std::string log = std::string("Received message from ")
-    + std::to_string(from.value) + std::string(", content: ") + text;
-
-    logger.logInfo(log);
-    context.smsdb.addReceivedSms(from, to, text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
-    context.user.showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+    logger
+        .logInfo("Received message from ", static_cast<int>(peer.value), ", content: ", text);
+    const auto number_of_this_UE = context.bts.getMyPhoneNumber();
+    context.smsdb.addReceivedSms(
+        peer,
+        number_of_this_UE,
+        text); // Received SMS(from,text) stored in SMS DB (postcondition 1)
+    context.user
+        .showNewMessageIndicator(); // User is informed new SMS arrived (postcondition 2)
+}
+IUeGui::AcceptClose TalkingState::handleUEClose()
+{
+    context.timer.stopTimer();
+    context.bts.sendCallDrop(peer);
+    return true;
+}
+void TalkingState::handleDisconnect()
+{
+    context.setState<NotConnectedState>();
 }
 }

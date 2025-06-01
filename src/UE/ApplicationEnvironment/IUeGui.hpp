@@ -1,13 +1,11 @@
 #pragma once
 
+#include "Messages/PhoneNumber.hpp"
 #include <functional>
 #include <string>
-#include "Messages/PhoneNumber.hpp"
 
 namespace ue
 {
-
-using common::PhoneNumber;
 
 class IUeGui
 {
@@ -33,7 +31,7 @@ public:
     virtual void showConnecting() = 0;
     virtual void showNotConnected() = 0;
     virtual void showNewSms(bool present) = 0;
-    virtual void showPeerUserNotAvailable(PhoneNumber) = 0;
+    virtual void showPeerUserNotAvailable(common::PhoneNumber) = 0;
 
     virtual IListViewMode& setListViewMode() = 0;
     virtual ISmsComposeMode& setSmsComposeMode() = 0;

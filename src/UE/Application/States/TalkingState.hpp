@@ -8,25 +8,25 @@ namespace ue
 class TalkingState : public BaseState
 {
 public:
-    TalkingState(Context& context, common::PhoneNumber from, common::PhoneNumber to);
+    TalkingState(Context &context, const common::PhoneNumber &peer);
     void handleUnknownRecipient() override;
-    void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
-    void handleCallDropped(common::PhoneNumber from) override;
-    void handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string &message) override;
-    void handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string & message) override;
+    void handleCallDrop() override;
+    void handleCallDropped() override;
+    void handleCallTalk(const common::PhoneNumber& sender, const std::string &message) override;
+    void handleSendCallTalk(const std::string &message) override;
     void handleTimeout() override;
     void handleCallRequest(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
+                           const common::PhoneNumber &peer,
                            const std::string &enc) override;
     void handleIncomingSMS(common::MessageId msgId,
-                            common::PhoneNumber from,
-                            common::PhoneNumber to,
-                            const std::string& text) override;
+                           const common::PhoneNumber &peer,
+                           const std::string &text) override;
+    IUeGui::AcceptClose handleUEClose() override;
+    void handleDisconnect() override;
 
 private:
-    common::PhoneNumber m_from;
-    common::PhoneNumber m_to;
+    common::PhoneNumber peer;
+    const std::chrono::minutes TALKING_TIMEOUT{2};
 };
 
 }

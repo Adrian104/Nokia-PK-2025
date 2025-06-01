@@ -13,10 +13,36 @@ NotConnectedState::NotConnectedState(Context &context)
 
 void NotConnectedState::handleSib(common::BtsId btsId)
 {
-    using namespace std::chrono_literals;
-    context.bts.sendAttachRequest(btsId);
-    context.setState<ConnectingState>();
-    context.timer.startTimer(500ms);
+    context.setState<ConnectingState>(btsId);
+}
+void NotConnectedState::handleIncomingSMS(common::MessageId msgId,
+                                          const common::PhoneNumber &peer,
+                                          const std::string &text)
+{
+    return;
+    // This is a no-op, as we do not expect to receive SMS while connecting.
+    // Since this method is purely virtual in BaseState we have to explicitly define
+    // it here - otherwise we would get a compilation error.
+}
+void NotConnectedState::handleCallRequest(common::MessageId msgId,
+                                          const common::PhoneNumber &peer,
+                                          const std::string &enc)
+{
+    return;
+    // This is a no-op, as we do not expect to receive call request while not connected.
+    // Since this method is purely virtual in BaseState we have to explicitly define
+    // it here - otherwise we would get a compilation error.
+}
+IUeGui::AcceptClose NotConnectedState::handleUEClose()
+{
+    return true;
 }
 
+void NotConnectedState::handleDisconnect()
+{
+    return;
+    // This is a no-op, as we do not expect to disconnect from BTS while not connected.
+    // Since this method is purely virtual in BaseState we have to explicitly define
+    // it here - otherwise we would get a compilation error.
+}
 }

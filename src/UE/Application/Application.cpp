@@ -46,19 +46,17 @@ void Application::handleDisconnect()
 }
 
 void Application::handleIncomingSMS(common::MessageId msgId,
-                                    common::PhoneNumber from,
-                                    common::PhoneNumber to,
-                                    const std::string& text)
+                                    const common::PhoneNumber &peer,
+                                    const std::string &text)
 {
-    context.state->handleIncomingSMS(msgId, from, to, text);
+    context.state->handleIncomingSMS(msgId, peer, text);
 }
 
 void Application::handleCallRequest(common::MessageId msgId,
-                       common::PhoneNumber from,
-                       common::PhoneNumber to,
-                       const std::string& enc)
+                                    const common::PhoneNumber &peer,
+                                    const std::string &enc)
 {
-    context.state->handleCallRequest(msgId, from, to, enc);
+    context.state->handleCallRequest(msgId, peer, enc);
 }
 
 void Application::handleViewSmsList()
@@ -66,30 +64,29 @@ void Application::handleViewSmsList()
     context.state->handleViewSmsList();
 }
 
-void Application::handleViewSms(SmsRecord& sms)
+void Application::handleViewSms(SmsRecord &sms)
 {
     context.state->handleViewSms(sms);
 }
 
-void Application::handleSendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+void Application::handleSendSms(const common::PhoneNumber &peer, const std::string &text)
 {
-    context.state->handleSendSms(from, to, text);
+    context.state->handleSendSms(peer, text);
 }
 
 void Application::handleSmsResponse(bool status)
 {
     context.state->handleSmsResponse(status);
-
 }
 
-void Application::handleCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+void Application::handleCallDrop()
 {
-    context.state->handleCallDrop(from, to);
+    context.state->handleCallDrop();
 }
 
-void Application::handleCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+void Application::handleCallAccept()
 {
-    context.state->handleCallAccept(from, to);
+    context.state->handleCallAccept();
 }
 
 void Application::handleUnknownRecipient()
@@ -97,24 +94,24 @@ void Application::handleUnknownRecipient()
     context.state->handleUnknownRecipient();
 }
 
-void Application::handleCallTalk(common::MessageId msgId, common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+void Application::handleCallTalk(const common::PhoneNumber& sender, const std::string &message)
 {
-    context.state->handleCallTalk(msgId, from, to, message);
+    context.state->handleCallTalk(sender, message);
 }
 
-void Application::handleSendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string& message)
+void Application::handleSendCallTalk(const std::string &message)
 {
-    context.state->handleSendCallTalk(from, to, message);
+    context.state->handleSendCallTalk(message);
 }
 
-void Application::handleSendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
+void Application::handleSendCallRequest(const common::PhoneNumber &peer)
 {
-    context.state->handleSendCallRequest(from, to);
+    context.state->handleSendCallRequest(peer);
 }
 
-void Application::handleCallDropped(common::PhoneNumber from)
+void Application::handleCallDropped()
 {
-    context.state->handleCallDropped(from);
+    context.state->handleCallDropped();
 }
 
 void Application::handleCallAccepted()

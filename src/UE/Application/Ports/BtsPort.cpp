@@ -5,16 +5,17 @@
 namespace ue
 {
 
-BtsPort::BtsPort(common::ILogger &logger, common::ITransport &transport, common::PhoneNumber phoneNumber)
-    : logger(logger, "[BTS-PORT]"),
-      transport(transport),
-      phoneNumber(phoneNumber)
+BtsPort::BtsPort(common::ILogger &logger,
+                 common::ITransport &transport,
+                 common::PhoneNumber phoneNumber)
+    : logger(logger, "[BTS-PORT]"), transport(transport), phoneNumber(phoneNumber)
 {}
 
 void BtsPort::start(IBtsEventsHandler &handler)
 {
-    transport.registerMessageCallback([this](BinaryMessage msg) {handleMessage(msg);});
-    transport.registerDisconnectedCallback([this]() {handleDisconnect();});
+    transport.registerMessageCallback([this](common::BinaryMessage msg)
+                                      { handleMessage(msg); });
+    transport.registerDisconnectedCallback([this]() { handleDisconnect(); });
     this->handler = &handler;
 }
 
@@ -25,7 +26,7 @@ void BtsPort::stop()
     handler = nullptr;
 }
 
-void BtsPort::handleMessage(BinaryMessage msg)
+void BtsPort::handleMessage(common::BinaryMessage msg)
 {
     try
     {
@@ -33,6 +34,11 @@ void BtsPort::handleMessage(BinaryMessage msg)
         auto msgId = reader.readMessageId();
         auto from = reader.readPhoneNumber();
         auto to = reader.readPhoneNumber();
+        // Read 'to' phone number, but we don't use it here
+        // It is important so that subsequent call to readRemainingText() works correctly,
+        // and doesn't try to read the 'to' phone number as a text.
+        // Reader is stateful, so it keeps track of the current position in the message.
+
 
         switch (msgId)
         {
@@ -53,8 +59,8 @@ void BtsPort::handleMessage(BinaryMessage msg)
         }
         case common::MessageId::Sms:
         {
-            const std::string& text = reader.readRemainingText();
-            handler->handleIncomingSMS(msgId, from, to, text);
+            const std::string &text = reader.readRemainingText();
+            handler->handleIncomingSMS(msgId, from, text);
             break;
         }
         case common::MessageId::UnknownRecipient:
@@ -64,14 +70,15 @@ void BtsPort::handleMessage(BinaryMessage msg)
         }
         case common::MessageId::CallRequest:
         {
-            const std::string& encryptionData = reader.readRemainingText();
-            handler->handleCallRequest(msgId, from, to, encryptionData);
+            const std::string &encryptionData = reader.readRemainingText();
+            handler->handleCallRequest(msgId, from, encryptionData);
             break;
         }
         case common::MessageId::CallTalk:
         {
-            const std::string& text = reader.readRemainingText();
-            handler->handleCallTalk(msgId, from, to, text);
+
+            const std::string &text = reader.readRemainingText();
+            handler->handleCallTalk(from, text);
             break;
         }
         case common::MessageId::CallAccepted:
@@ -81,20 +88,18 @@ void BtsPort::handleMessage(BinaryMessage msg)
         }
         case common::MessageId::CallDropped:
         {
-            handler->handleCallDropped(from);
+            handler->handleCallDropped();
             break;
         }
         default:
             logger.logError("unknow message: ", msgId, ", from: ", from);
-
         }
     }
-    catch (std::exception const& ex)
+    catch (std::exception const &ex)
     {
         logger.logError("handleMessage error: ", ex.what());
     }
 }
-
 
 void BtsPort::sendAttachRequest(common::BtsId btsId)
 {
@@ -104,8 +109,6 @@ void BtsPort::sendAttachRequest(common::BtsId btsId)
                                 common::PhoneNumber{}};
     msg.writeBtsId(btsId);
     transport.sendMessage(msg.getMessage());
-
-
 }
 
 void BtsPort::handleDisconnect()
@@ -117,84 +120,83 @@ void BtsPort::handleDisconnect()
         logger.logError("handleDisconnect: handler is nullptr");
 }
 
-bool BtsPort::sendSms(const common::PhoneNumber& from, const common::PhoneNumber& to, const std::string& text)
+bool BtsPort::sendSms(const common::PhoneNumber &peer, const std::string &text)
 {
-    logger.logDebug("sendSms: from ", from.value, " to ", to.value, " text: ", text);
+    logger.logDebug("sendSms: from ", phoneNumber.value, " to ", peer.value, " text: ", text);
 
     try
     {
-        common::OutgoingMessage msg{common::MessageId::Sms, from, to};
+        common::OutgoingMessage msg{common::MessageId::Sms, phoneNumber, peer};
         msg.writeText(text);
         transport.sendMessage(msg.getMessage());
         return true;
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         logger.logError("Failed to send SMS: ", e.what());
         return false;
     }
 }
 
-bool BtsPort::sendCallDrop(common::PhoneNumber from, common::PhoneNumber to)
+bool BtsPort::sendCallDrop(const common::PhoneNumber &peer)
 {
-    logger.logDebug("sendCallDrop: from ", from, " to ", to);
+    logger.logDebug("sendCallDrop: from ", phoneNumber, " to ", peer);
 
     try
     {
-        common::OutgoingMessage msg{common::MessageId::CallDropped, to, from};
+        common::OutgoingMessage msg{common::MessageId::CallDropped, phoneNumber, peer};
         transport.sendMessage(msg.getMessage());
         return true;
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         logger.logError("Failed to send call drop: ", e.what());
         return false;
     }
 }
 
-bool BtsPort::sendCallAccept(common::PhoneNumber from, common::PhoneNumber to)
+bool BtsPort::sendCallAccept(const common::PhoneNumber &peer)
 {
-    logger.logDebug("sendCallAccept: from ", from, " to ", to);
+    logger.logDebug("sendCallAccept: from ", phoneNumber, " to ", peer);
 
     try
     {
-        common::OutgoingMessage msg{common::MessageId::CallAccepted, to, from};
+        common::OutgoingMessage msg{common::MessageId::CallAccepted, phoneNumber, peer};
         transport.sendMessage(msg.getMessage());
         return true;
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         logger.logError("Failed to send call accept: ", e.what());
         return false;
     }
 }
 
-bool BtsPort::sendCallTalk(common::PhoneNumber from, common::PhoneNumber to, const std::string &message)
+bool BtsPort::sendCallTalk(const common::PhoneNumber &peer, const std::string &message)
 {
-    logger.logDebug("sendCallTalk: from ", from, " to ", to);
+    logger.logDebug("sendCallTalk: from ", phoneNumber, " to ", peer);
 
     try
     {
-        common::OutgoingMessage msg{common::MessageId::CallTalk, from, to};
+        common::OutgoingMessage msg{common::MessageId::CallTalk, phoneNumber, peer};
         msg.writeText(message);
         transport.sendMessage(msg.getMessage());
         return true;
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         logger.logError("Failed to send call talk: ", e.what());
         return false;
     }
-
 }
 
-bool BtsPort::sendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
+bool BtsPort::sendCallRequest(const common::PhoneNumber &peer)
 {
-    logger.logDebug("sendCallRequest: from ", from, " to ", to);
+    logger.logDebug("sendCallRequest: from ", phoneNumber, " to ", peer);
 
     try
     {
-        common::OutgoingMessage msg{common::MessageId::CallRequest, from, to};
+        common::OutgoingMessage msg{common::MessageId::CallRequest, phoneNumber, peer};
         transport.sendMessage(msg.getMessage());
         return true;
     }
@@ -203,6 +205,10 @@ bool BtsPort::sendCallRequest(common::PhoneNumber from, common::PhoneNumber to)
         logger.logError("Failed to send call request: ", e.what());
         return false;
     }
+}
+common::PhoneNumber BtsPort::getMyPhoneNumber() const
+{
+    return phoneNumber;
 }
 
 }

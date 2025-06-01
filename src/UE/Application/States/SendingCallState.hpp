@@ -8,24 +8,24 @@ namespace ue
 class SendingCallState : public BaseState
 {
 public:
-    SendingCallState(Context &context, common::PhoneNumber from, common::PhoneNumber to);
+    SendingCallState(Context &context, const common::PhoneNumber& peer);
+
     void handleUnknownRecipient() override;
-    void handleCallDropped(common::PhoneNumber from) override;
+    void handleCallDropped() override;
     void handleCallAccepted() override;
     void handleTimeout() override;
     void handleCallRequest(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
+                           const common::PhoneNumber& peer,
                            const std::string &enc) override;
-    void handleCallDrop(common::PhoneNumber from, common::PhoneNumber to) override;
+    void handleCallDrop() override;
     void handleIncomingSMS(common::MessageId msgId,
-                           common::PhoneNumber from,
-                           common::PhoneNumber to,
-                           const std::string& text) override;
+                           const common::PhoneNumber &peer,
+                           const std::string &text) override;
+    IUeGui::AcceptClose handleUEClose() override;
+    void handleDisconnect() override;
 
 private:
-    common::PhoneNumber m_from;
-    common::PhoneNumber m_to;
+    const common::PhoneNumber peer;
 };
 
 }
