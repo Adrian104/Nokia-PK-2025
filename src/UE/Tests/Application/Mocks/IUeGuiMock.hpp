@@ -63,6 +63,7 @@ public:
     MOCK_METHOD(common::PhoneNumber, getPhoneNumber, (), (const, final));
     MOCK_METHOD(std::string, getSmsText, (), (const, final));
     MOCK_METHOD(void, clearSmsText, (), (final));
+    MOCK_METHOD(void, setSmsText, (const std::string&), (final));
 };
 
 class ICallModeMock : public IUeGui::ICallMode

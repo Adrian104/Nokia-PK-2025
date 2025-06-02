@@ -90,8 +90,8 @@ TEST_F(UserPortTestSuite, shallShowSms)
 
 TEST_F(UserPortTestSuite, shallshowSmsComposeMode)
 {
+    EXPECT_CALL(smsComposeModeMock, setSmsText(_));
     EXPECT_CALL(guiMock, setSmsComposeMode()).WillOnce(ReturnRef(smsComposeModeMock));
-    EXPECT_CALL(smsComposeModeMock, clearSmsText());
     EXPECT_CALL(guiMock, setAcceptCallback(_));
     EXPECT_CALL(guiMock, setRejectCallback(_));
     objectUnderTest.showSmsComposeMode();

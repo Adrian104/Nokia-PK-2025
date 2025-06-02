@@ -125,7 +125,6 @@ struct ApplicationConnectedTestSuite : ApplicationConnectingTestSuite
 
     void handleSendSms(const common::PhoneNumber &peer, const std::string &text)
     {
-        EXPECT_CALL(btsPortMock, sendSms(_, _));
         objectUnderTest.handleSendSms(peer, text);
     }
 
@@ -182,7 +181,7 @@ TEST_F(ApplicationConnectedTestSuite, shallHandleSendSms)
 {
     common::PhoneNumber peer{123};
     std::string text("test");
-    EXPECT_CALL(btsPortMock, getMyPhoneNumber());
+    EXPECT_CALL(userPortMock, showSmsComposeMode(_));
     handleSendSms(peer, text);
 }
 
