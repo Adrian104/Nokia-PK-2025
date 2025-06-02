@@ -59,7 +59,7 @@ void UserPort::showConnected()
             switch (static_cast<unsigned int>(selected.second))
             {
             case 0: // "Compose SMS"
-                showSmsComposeMode();
+                handler->handleSendSms(common::PhoneNumber(), "");
                 break;
             case 1: // "View SMS"
                 handler->handleViewSmsList();
@@ -116,7 +116,7 @@ void UserPort::showSms(SmsRecord &sms)
 
     if (sms.m_status == SmsStatus::FAILED)
     {
-        menu.addSelectionListItem("Message failed\n to be delivered", "");
+        menu.addSelectionListItem("Message failed\nto be delivered", "");
     }
     menu.addSelectionListItem("From: " + std::to_string(sms.m_from.value), "");
     menu.addSelectionListItem("To: " + std::to_string(sms.m_to.value), "");
@@ -127,10 +127,10 @@ void UserPort::showSms(SmsRecord &sms)
     gui.setRejectCallback([this]() { handler->handleViewSmsList(); });
 }
 
-void UserPort::showSmsComposeMode()
+void UserPort::showSmsComposeMode(const std::string &text)
 {
     IUeGui::ISmsComposeMode &composeMode = gui.setSmsComposeMode();
-    composeMode.clearSmsText();
+    composeMode.setSmsText(text);
 
     gui.setAcceptCallback(
         [this, &composeMode]()
@@ -148,7 +148,7 @@ void UserPort::showSmsComposeMode()
             }
         });
 
-    gui.setRejectCallback([this]() { showConnected(); });
+    gui.setRejectCallback([this]() { handler->handleCallDrop(); });
 }
 
 void UserPort::showIncomingCall(const common::PhoneNumber &peer)

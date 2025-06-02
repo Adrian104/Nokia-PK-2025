@@ -33,7 +33,7 @@ public:
     MOCK_METHOD(void, showNewMessageIndicator, (), (final));
     MOCK_METHOD(void, showSmsList, (SmsDB&), (final));
     MOCK_METHOD(void, showSms, (SmsRecord&), (final));
-    MOCK_METHOD(void, showSmsComposeMode, (), (final));
+    MOCK_METHOD(void, showSmsComposeMode, (const std::string&), (final));
 
     MOCK_METHOD(void, showIncomingCall, (const common::PhoneNumber&), (final));
     MOCK_METHOD(void, showTalk, (), (final));
