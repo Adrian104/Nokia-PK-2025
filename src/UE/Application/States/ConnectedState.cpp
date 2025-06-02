@@ -3,12 +3,17 @@
 #include "NotConnectedState.hpp"
 #include "ReceivingCallState.hpp"
 #include "SendingCallState.hpp"
+#include "SendingSmsState.hpp"
 #include "UnknownPeerState.hpp"
 
 namespace ue
 {
 
-ConnectedState::ConnectedState(Context &context) : BaseState(context, "ConnectedState")
+ConnectedState::ConnectedState(Context &context,
+                               bool smsSent,
+                               const common::PhoneNumber &peer,
+                               const std::string &text)
+    : BaseState(context, "ConnectedState"), smsSent(smsSent), peer(peer), text(text)
 {
     context.user.showConnected();
 }
@@ -57,31 +62,20 @@ void ConnectedState::handleViewSms(SmsRecord &sms)
 
 void ConnectedState::handleSendSms(const common::PhoneNumber &peer, const std::string &text)
 {
-    context.logger
-        .logInfo("Sending SMS to ", static_cast<int>(peer.value), ", SMS content: ", text);
-
-    const auto number_of_this_UE = context.bts.getMyPhoneNumber();
-
-    context.smsdb.addSms(number_of_this_UE, peer, text);
-
-    if (!context.bts.sendSms(peer, text))
-    {
-        context.smsdb.markLastSmsSentAsFailed();
-        context.logger.logInfo("Failed to send SMS to ", static_cast<int>(peer.value));
-    }
-    else
-    {
-        context.user.showConnected();
-        context.logger.logInfo("SMS sent successfully to BTS");
-    }
+    // Peer and text are dummy default values, when called from UserPort showConnected screen
+    // we reuse this method to change state to SendingSmsState
+    context.setState<SendingSmsState>();
 }
 
 void ConnectedState::handleSmsResponse(bool status)
 {
-    if (!status)
+    if (!status && smsSent)
     {
         context.smsdb.markLastSmsSentAsFailed();
         context.logger.logError("SMS delivery failed - unknown recipient");
+        context.setState<UnknownPeerState>(peer,
+                                           [this](Context &unknownContext)
+                                           { unknownContext.setState<ConnectedState>(); });
     }
 }
 
@@ -113,6 +107,19 @@ void ConnectedState::handleSendCallRequest(const common::PhoneNumber &peer)
 IUeGui::AcceptClose ConnectedState::handleUEClose()
 {
     return true;
+}
+
+void ConnectedState::handleUnknownRecipient()
+{
+    if (smsSent)
+    {
+        context.smsdb.markLastSmsSentAsFailed();
+        auto textCopy = this->text;
+        context.setState<UnknownPeerState>(
+            peer,
+            [textCopy](Context &unknownContext)
+            { unknownContext.setState<SendingSmsState>(textCopy); });
+    }
 }
 
 }

@@ -24,7 +24,7 @@ public:
     void showNewMessageIndicator() override; // Highlights "M" in the top left corner of the phone
     void showSmsList(SmsDB& smsdb) override; // Shows the SMS list view screen
     void showSms(SmsRecord& sms) override; // Shows the SMS view screen
-    void showSmsComposeMode() override; // Shows the SMS compose mode screen
+    void showSmsComposeMode(const std::string &text = "") override; // Shows the SMS compose mode screen
     void showIncomingCall(const common::PhoneNumber& peer) override;
     void showTalk() override;
     void addCallMessage(const common::PhoneNumber& sender, const std::string &message) override;
