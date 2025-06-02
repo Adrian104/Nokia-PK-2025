@@ -106,10 +106,10 @@ void UserPort::showSmsList(SmsDB &smsdb)
             handler->handleViewSms(selectedSms);
         });
 
-    gui.setRejectCallback([this]() { showConnected(); });
+    gui.setRejectCallback([this]() { handler->handleCallDrop(); });
 }
 
-void UserPort::showSms(SmsRecord &sms)
+void UserPort::showSms(const SmsRecord &sms)
 {
     IUeGui::IListViewMode &menu = gui.setListViewMode();
     menu.clearSelectionList();
@@ -124,7 +124,7 @@ void UserPort::showSms(SmsRecord &sms)
 
     gui.setAcceptCallback(nullptr);
 
-    gui.setRejectCallback([this]() { handler->handleViewSmsList(); });
+    gui.setRejectCallback([this]() { handler->handleCallDrop(); });
 }
 
 void UserPort::showSmsComposeMode(const std::string &text)
