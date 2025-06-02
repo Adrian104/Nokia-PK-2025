@@ -6,37 +6,38 @@ std::string SmsRecord::getTitle() const
 {
     std::string buffer;
 
+    if (m_direction == SmsDir::SENT && m_status == SmsStatus::FAILED)
+        buffer += "(ERR) ";
+
     if (m_isNew)
         buffer += "(NEW) ";
 
     if (m_direction == SmsDir::RECEIVED)
         buffer += "from: " + std::to_string(m_from.value);
     else if (m_direction == SmsDir::SENT)
-        buffer += "to: " + std::to_string(m_from.value);
+        buffer += "to: " + std::to_string(m_to.value);
 
     return buffer;
 }
 
-void SmsDB::addReceivedSms(
-	common::PhoneNumber from,
-	common::PhoneNumber to,
-	const std::string& message)
+void SmsDB::addReceivedSms(common::PhoneNumber from,
+                           common::PhoneNumber to,
+                           const std::string &message)
 {
-	SmsRecord sms{};
-	sms.m_creationTime = clk_t::now();
-	sms.m_direction = SmsDir::RECEIVED;
-	sms.m_from = from;
-	sms.m_to = to;
-	sms.m_message = message;
-	sms.m_isNew = true;
+    SmsRecord sms{};
+    sms.m_creationTime = clk_t::now();
+    sms.m_direction = SmsDir::RECEIVED;
+    sms.m_from = from;
+    sms.m_to = to;
+    sms.m_message = message;
+    sms.m_isNew = true;
 
-	m_database.push_back(std::move(sms));
+    m_database.push_back(std::move(sms));
 }
 
-void SmsDB::addSms(
-    common::PhoneNumber from,
-    common::PhoneNumber to,
-    const std::string& message)
+void SmsDB::addSms(common::PhoneNumber from,
+                   common::PhoneNumber to,
+                   const std::string &message)
 {
     SmsRecord sms{};
     sms.m_creationTime = clk_t::now();
@@ -63,7 +64,7 @@ void SmsDB::markLastSmsSentAsFailed()
 
 bool SmsDB::hasUnreadMessages() const
 {
-    for (const SmsRecord& rec : m_database)
+    for (const SmsRecord &rec : m_database)
         if (rec.m_isNew)
             return true;
 
@@ -72,11 +73,11 @@ bool SmsDB::hasUnreadMessages() const
 
 std::vector<SmsRecord>::iterator SmsDB::begin()
 {
-	return m_database.begin();
+    return m_database.begin();
 }
 
 std::vector<SmsRecord>::iterator SmsDB::end()
 {
-	return m_database.end();
+    return m_database.end();
 }
 }

@@ -26,7 +26,7 @@ public:
 private:
     const ITimerPort::Duration TIMEOUT_DURATION = std::chrono::seconds(2);
     common::PhoneNumber peer;
-    std::function<void(Context &unknownContext)> exitStateCallback;
+    const std::function<void(Context &unknownContext)> exitStateCallback;
     void exitState();
     bool runExitStateCallback();
 };

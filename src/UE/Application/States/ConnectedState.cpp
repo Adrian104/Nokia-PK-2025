@@ -5,6 +5,8 @@
 #include "SendingCallState.hpp"
 #include "SendingSmsState.hpp"
 #include "UnknownPeerState.hpp"
+#include "ViewingSmsListState.hpp"
+#include "ViewingSmsState.hpp"
 
 namespace ue
 {
@@ -47,17 +49,12 @@ void ConnectedState::handleCallRequest(common::MessageId msgId,
 
 void ConnectedState::handleViewSmsList()
 {
-    logger.logInfo("View message list");
-    context.user.showSmsList(context.smsdb);
+    context.setState<ViewingSmsListState>();
 }
 
 void ConnectedState::handleViewSms(SmsRecord &sms)
 {
-    std::string log = std::string("View message from ") + std::to_string(sms.m_from.value) +
-                      std::string(", to: ") + std::to_string(sms.m_to.value) +
-                      std::string(", message: ") + sms.m_message;
-    logger.logInfo(log);
-    context.user.showSms(sms);
+    context.setState<ViewingSmsState>(sms);
 }
 
 void ConnectedState::handleSendSms(const common::PhoneNumber &peer, const std::string &text)

@@ -29,7 +29,7 @@ public:
     virtual void showConnected() = 0;
     virtual void showNewMessageIndicator() = 0; // Highlights "M" in the top left corner of the phone
     virtual void showSmsList(SmsDB& smsdb) = 0; // Shows the SMS list view screen
-    virtual void showSms(SmsRecord& sms) = 0; // Shows the SMS view screen
+    virtual void showSms(const SmsRecord& sms) = 0; // Shows the SMS view screen
     virtual void showSmsComposeMode(const std::string &text) = 0;
     virtual void showIncomingCall(const common::PhoneNumber& peer) = 0;
     virtual void showTalk() = 0;

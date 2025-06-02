@@ -6,8 +6,13 @@
 
 namespace ue
 {
-ReceivingCallState::ReceivingCallState(Context &context, const common::PhoneNumber &peer)
-    : BaseState(context, "ReceivingCallState"), peer(peer)
+ReceivingCallState::ReceivingCallState(
+    Context &context,
+    const common::PhoneNumber &peer,
+    const std::function<void(Context &unknownContext)> &exitStateCallback)
+    : BaseState(context, "ReceivingCallState"),
+      peer(peer),
+      exitStateCallback(exitStateCallback)
 {
     context.user.showIncomingCall(peer);
     context.timer.startTimer(timeoutDuration);
@@ -71,7 +76,7 @@ IUeGui::AcceptClose ReceivingCallState::handleUEClose()
     return true;
 }
 
-void ReceivingCallState::dropAndGoToMainMenu(const bool send_drop_msg) const
+void ReceivingCallState::dropAndGoToMainMenu(const bool send_drop_msg)
 {
     context.timer.stopTimer();
     context.logger.logInfo("Dropping call from ", static_cast<int>(peer.value));
@@ -79,6 +84,29 @@ void ReceivingCallState::dropAndGoToMainMenu(const bool send_drop_msg) const
     {
         context.bts.sendCallDrop(peer);
     }
-    context.setState<ConnectedState>();
+
+    exitState();
 }
+
+void ReceivingCallState::exitState()
+{
+    if (!runExitStateCallback())
+    {
+        context.timer.stopTimer();
+        context.logger.logInfo(
+            "No exitStateCallback provided, going back to ConnectedState by default");
+        context.setState<ConnectedState>();
+    }
+}
+
+bool ReceivingCallState::runExitStateCallback()
+{
+    if (exitStateCallback != nullptr)
+    {
+        exitStateCallback(context);
+        return true;
+    }
+    return false;
+}
+
 }
